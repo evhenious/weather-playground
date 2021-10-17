@@ -1,6 +1,7 @@
-# Getting Started with Create React App
+# Simple weatcher app for selected city.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+But tweaked with CRACO scipts to overrade some settings and make available Tailwinds CSS.
 
 ## Available Scripts
 

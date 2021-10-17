@@ -4,15 +4,29 @@ import { fetchCityList } from '../utils/cityResolver';
 import { City } from '../types';
 import CityList from './CityList';
 
-const CitySearch: React.FC = () => {
-  const [cityName, setCityName] = useState<string>('');
+interface Props {
+  currentCity: City | undefined,
+  setCurrentCity: (city: City) => void
+}
+
+const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity }) => {
+  const [cityName, setCityName] = useState<string>(currentCity?.name || '');
   const [cityList, setCityList] = useState<City[]>();
   const [isCityChosen, setCityChosen] = useState(false);
 
   const selectCity = (index: number) => {
-    setCityChosen(true);
-    cityList && setCityName(cityList[index].name);
+    if (cityList) {
+      setCityChosen(true);
+      setCurrentCity(cityList[index]);
+      setCityName(cityList[index].name);
+    }
     setCityList([]);
+  }
+
+  const cancelCityChange = () => {
+    setCityChosen(true);
+    setCityList([]);
+    setCityName(currentCity?.name || '');
   }
 
   const inputHandler = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +76,7 @@ const CitySearch: React.FC = () => {
                 onChange={inputHandler}
               />
             </div>
-            {cityList?.length ? <CityList data={cityList} onSelect={selectCity}/> : false}
+            {cityList?.length ? <CityList data={cityList} onSelect={selectCity} onCancel={cancelCityChange}/> : false}
           </div>
         </div>
       </div>
