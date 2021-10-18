@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { debounce } from 'lodash';
-import { fetchCityList } from '../utils/cityNameResolver';
 import { City } from '../types';
 import CityList from './CityList';
 
 interface Props {
   currentCity: City | undefined;
   setCurrentCity: (city: City) => void;
+  cityNameResolver: { fetchCityList: (namePart: string) => Promise<City[]> };
 }
 
-const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity }) => {
+const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameResolver }) => {
   const [cityName, setCityName] = useState<string>(currentCity?.name || '');
   const [cityList, setCityList] = useState<City[]>();
   const [isCityChosen, setCityChosen] = useState(false);
@@ -41,10 +41,10 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity }) => {
           return;
         }
 
-        const data = await fetchCityList(cityName);
+        const data = await cityNameResolver.fetchCityList(cityName);
         setCityList(data);
       }, 400),
-    [isCityChosen]
+    [isCityChosen, cityNameResolver]
   );
 
   // cleanup for debounced callback on unmount
@@ -65,7 +65,9 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity }) => {
       <div className='px-4 py-5 bg-white space-y-6 sm:p-6'>
         <div className='block'>
           <div className='mt-1 flex shadow-sm'>
-            <span className={`inline-flex items-center px-3 ${radiusLabel} border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm`}>
+            <span
+              className={`inline-flex items-center px-3 ${radiusLabel} border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm`}
+            >
               Your city is:
             </span>
             <input
