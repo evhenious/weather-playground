@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { debounce } from 'lodash';
-import { fetchCityList } from '../utils/cityResolver';
+import { fetchCityList } from '../utils/cityNameResolver';
 import { City } from '../types';
 import CityList from './CityList';
 
