@@ -5,15 +5,20 @@ class CityNameResolver extends Fetcher {
   public async fetchCityList(cityNamePart: string): Promise<City[]> {
     let resp: CityResponse | undefined;
 
-    const params = {
+    const tempParams  = {
       hateoasMode: false,
       limit: 5,
       namePrefix: cityNamePart,
-      offset: 0,
+      offset: 0
     };
 
+    const params = {
+      url: '/v1/geo/cities',
+      params: JSON.stringify(tempParams)
+    }
+
     try {
-      resp = await this.get<CityResponse>('/v1/geo/cities', params);
+      resp = await this.get<CityResponse>('/geo', params);
     } catch (err) {
       console.error('Cannot fetch cities', err);
     }
