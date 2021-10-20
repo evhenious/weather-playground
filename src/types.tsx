@@ -10,3 +10,23 @@ export type CityResponse = {
     data: City[];
   };
 };
+
+export type Weather = {
+  main: {
+    temp: number;
+    pressure: number;
+    humidity: number;
+  };
+  wind: {
+    speed: number;
+    deg: number;
+  };
+  sys: {
+    sunrise: number;
+    sunset: number;
+  };
+};
+
+export type WeatherResponse = {
+  data: Weather;
+};

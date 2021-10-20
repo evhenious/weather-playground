@@ -1,22 +1,22 @@
-import { City } from '../../types';
+import { City, Weather, WeatherResponse } from '../../types';
 import Fetcher from './Fetcher';
 
 class CityWeatherResolver extends Fetcher {
-  public async fetchCityWeather(city: City): Promise<any> {
+  public async fetchCityWeather(city: City): Promise<Weather | undefined> {
     const params = {
       q: `${city.name},${city.countryCode}`,
       units: 'metric',
     };
 
-    let resp = '';
+    let resp: WeatherResponse | undefined;
 
     try {
-      resp = await this.get<any>('/data/2.5/weather', params); // TODO: refactor 'any' to match example below
+      resp = await this.get<WeatherResponse>('/data/2.5/weather', params);
     } catch (err) {
       console.error('Cannot fetch city weather', err);
     }
 
-    return resp;
+    return resp ? resp.data : resp;
   }
 }
 
@@ -25,7 +25,7 @@ export default CityWeatherResolver;
 /*
 const resp = {
   coord: { lon: 24.0232, lat: 49.8383 },
-  weather: [{ id: 804, main: 'Clouds', description: 'overcast clouds', icon: '04n' }],
+  weather: [{ id: 804, main: 'Clouds', description: 'overcast clouds', icon: '04n' }], <-------------- UNPROCESSED FOR NOW
   base: 'stations',
   main: { temp: 7.17, feels_like: 5.11, temp_min: 6.4, temp_max: 7.21, pressure: 1025, humidity: 98 },
   visibility: 6000,

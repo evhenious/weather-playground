@@ -42,6 +42,7 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameReso
         }
 
         const data = await cityNameResolver.fetchCityList(cityName);
+        // TODO: show notification if no city found
         setCityList(data);
       }, 400),
     [isCityChosen, cityNameResolver]
