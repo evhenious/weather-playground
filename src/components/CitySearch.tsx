@@ -4,7 +4,7 @@ import { City } from '../types';
 import CityList from './CityList';
 
 interface Props {
-  currentCity: City | undefined;
+  currentCity: City | null;
   setCurrentCity: (city: City) => void;
   cityNameResolver: { fetchCityList: (namePart: string) => Promise<City[]> };
 }
@@ -12,7 +12,7 @@ interface Props {
 const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameResolver }) => {
   const [cityName, setCityName] = useState<string>(currentCity?.name || '');
   const [cityList, setCityList] = useState<City[]>();
-  const [isCityChosen, setCityChosen] = useState(false);
+  const [isCityChosen, setCityChosen] = useState(!!currentCity);
 
   const selectCity = (index: number) => {
     if (cityList) {
@@ -31,7 +31,7 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameReso
 
   const inputHandler = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setCityName(target.value);
-    setCityChosen(false);
+    isCityChosen && setCityChosen(false);
   };
 
   const debouncedSearchHandler = useMemo(
