@@ -34,8 +34,8 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
       ) : (
         <>
           <WeatherTab label='Main'>
-            <WeatherRow label='Temperature, C' data={weather.main.temp} />
-            <WeatherRow label='Feels like, C' data={weather.main.feels_like} />
+            <WeatherRow label='Temperature, C' data={weather.main.temp} type={DataType.temp} />
+            <WeatherRow label='Feels like, C' data={weather.main.feels_like} type={DataType.temp} />
             <WeatherRow label='Pressure, mmHg' data={weather.main.pressure} />
             <WeatherRow label='Humidity, %' data={weather.main.humidity} />
           </WeatherTab>
