@@ -26,6 +26,12 @@ export type Weather = {
     sunrise: number;
     sunset: number;
   };
+  visibility: number;
+  weather: {
+    description: string;
+    icon: string;
+    main: string;
+  }[]
 };
 
 export type WeatherResponse = {

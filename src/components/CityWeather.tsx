@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { City, Weather } from '../types';
-import { DataType, WeatherRow } from './WeatherRow';
+import { DataType } from '../utils/formatUtils';
+import WeatherMain from './WeatherMain';
+import WeatherRow from './WeatherRow';
 import { WeatherTab } from './WeatherTab';
 
 // The idea of this type - to not be locked on current CityWeatherResolver class,
@@ -30,14 +32,14 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
   return (
     <div className='px-5 py-10 gap-y-5 flex flex-col text-gray-50'>
       {!weather ? (
-        <WeatherTab label='Weather is Not Available' />
+        <WeatherTab label='Weather is Not Available...' />
       ) : (
         <>
-          <WeatherTab label='Main'>
-            <WeatherRow label='Temperature, C' data={weather.main.temp} type={DataType.temp} />
-            <WeatherRow label='Feels like, C' data={weather.main.feels_like} type={DataType.temp} />
-            <WeatherRow label='Pressure, mmHg' data={weather.main.pressure} />
-            <WeatherRow label='Humidity, %' data={weather.main.humidity} />
+          <WeatherMain data={weather} />
+          <WeatherTab>
+            <WeatherRow label='Visibility' data={weather.visibility} type={DataType.distance} />
+            <WeatherRow label='Pressure' data={weather.main.pressure} type={DataType.pressure} />
+            <WeatherRow label='Humidity' data={weather.main.humidity} type={DataType.humidity} />
           </WeatherTab>
           <WeatherTab label='Wind'>
             <WeatherRow label='Speed' data={weather.wind.speed} />
