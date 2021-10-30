@@ -1,6 +1,6 @@
 const http = require('http');
 
-const GEO_DB_BASE_URL = 'http://geodb-free-service.wirefreethought.com';
+const { GEO_DB_BASE_URL } = process.env;
 
 async function processRequest(req, res) {
   const { url: apiUrl, params = {} } = req.query;
@@ -16,11 +16,12 @@ async function processRequest(req, res) {
     const resp = await getGeoData(apiUrl, reqParams);
     res.json(resp);
   } catch (error) {
-    res.status(400).json({ error });
+    // error is a string here, as thrown in getGeoData
+    res.status(500).json({ error });
   }
 }
 
-function getGeoData(apiUrl, params) {
+function getGeoData(apiUrl = '', params = '') {
   const url = `${GEO_DB_BASE_URL}${apiUrl}${params}`;
   console.log('Calling:', url);
 
