@@ -62,8 +62,8 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameReso
   const radiusLabel = !!cityList?.length ? 'rounded-tl-md' : 'rounded-l-md';
 
   return (
-    <div className='shadow sm:rounded-md sm:overflow-hidden bg-opacity-60'>
-      <div className='px-4 py-5 bg-white space-y-6 sm:p-6'>
+    <div className='shadow sm:rounded-md sm:overflow-hidden'>
+      <div className='px-4 py-5 bg-gray-200 space-y-6 sm:p-6'>
         <div className='block'>
           <div className='mt-1 flex shadow-sm'>
             <span
