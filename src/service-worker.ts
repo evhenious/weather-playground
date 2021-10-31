@@ -13,6 +13,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
+import { CustomCacheFirst } from './serviceWorker/CustomCacheFirst'
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -29,13 +30,13 @@ registerRoute(
   // Add in any other file extensions or routing criteria as needed.
   ({ url }) => url.host.includes('openweathermap'),
   // Customize this strategy as needed
-  new CacheFirst({
+  new CustomCacheFirst({
     cacheName: 'weather-cache',
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used entries are removed.
       new ExpirationPlugin({
-        maxAgeSeconds: 60 * 15, // 15 min to keep weather response
+        maxAgeSeconds: 60, //60 * 15, // 15 min to keep weather response
         maxEntries: 5
       }),
     ],
@@ -50,7 +51,7 @@ registerRoute(
     cacheName: 'city-name-cache',
     plugins: [
       new ExpirationPlugin({
-        maxAgeSeconds: 60 * 60, // 1hr to keep city names response
+        maxAgeSeconds: 60 * 60 * 24, // 1 day to keep city names response
         maxEntries: 10
       }),
     ],
