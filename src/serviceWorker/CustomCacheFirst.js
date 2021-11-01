@@ -51,6 +51,17 @@ class CustomCacheFirst {
       request = new Request(request);
     }
 
+    const requestData = {
+      request,
+      response: null,
+    };
+
+    const cacheOptions = {
+      cacheName: this._cacheName,
+      plugins: this._plugins,
+    };
+
+    // Check in the cache, for starters
     let response = await cacheWrapper.match({
       cacheName: this._cacheName,
       request,
@@ -60,16 +71,14 @@ class CustomCacheFirst {
     });
 
     let error;
+
     if (!response) {
-      logger.log('No resp in a cache...');
-      // No response found in 'this._cacheName' cache. Will try respond from a network.
+      logger.log('No response in a cache, going to network...');
       try {
         response = await this._getFromNetwork(request, event);
-        this.waitTillCacheUpdated(event, request, response);
-        logger.log('Got resp from network!');
+        logger.log('Got fresh data from the network!');
       } catch (err) {
-        // Unable to get a response from the network
-        // Check in the last-chance cache before returning an error
+        console.log('No response from the network, checking in the last-chance cache before returning an error...');
         response = await cacheWrapper.match({
           cacheName: this._emergencyCacheName,
           request,
@@ -79,33 +88,25 @@ class CustomCacheFirst {
         });
 
         if (response) {
-          logger.log('last-chance cache response returns.');
+          logger.log('Got data from the last-chance cache.');
         } else {
           error = err;
-          logger.log('... and from network and last-chance-cache.');
+          logger.log('No data in network and both caches...');
         }
       }
     } else {
-      // Found a cached response
       logger.log('Cached response found.');
-
-      // Put it in last-chance cache in case
-      // there would be no network and user refreshes - to return the last known response all the time
-      // until the network appears back.
-      const requestData = {
-        request,
-        response,
-      };
-
-      const options = {
-        cacheName: this._emergencyCacheName,
-        plugins: [],
-      };
-
-      this.waitTillCacheUpdated(event, requestData, options);
+      cacheOptions.cacheName = this._emergencyCacheName;
+      cacheOptions.plugins = [];
     }
 
-    if (!response) {
+    // Put the response in the last-chance cache in case there would be no network,
+    // and user refreshes the app - to return the last known response all the time,
+    // until the network appears back.
+    if (response) {
+      requestData.response = response;
+      this.waitTillCacheUpdated(event, requestData, cacheOptions);
+    } else {
       throw new WorkboxError('no-response', { url: request.url, error });
     }
 
@@ -113,7 +114,7 @@ class CustomCacheFirst {
   }
 
   /**
-   * Handles the network and cache part of CacheFirst.
+   * Handles the network call for a data.
    *
    * @param {Request} request
    * @param {Event} [event]
@@ -128,18 +129,6 @@ class CustomCacheFirst {
       fetchOptions: this._fetchOptions,
       plugins: this._plugins,
     });
-
-    const requestData = {
-      request,
-      response,
-    };
-
-    const options = {
-      cacheName: this._cacheName,
-      plugins: this._plugins,
-    };
-
-    this.waitTillCacheUpdated(event, requestData, options);
 
     return response;
   }
