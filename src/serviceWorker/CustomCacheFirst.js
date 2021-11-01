@@ -4,7 +4,7 @@ import { fetchWrapper } from 'workbox-core/_private/fetchWrapper.js';
 import { WorkboxError } from 'workbox-core/_private/WorkboxError.js';
 import makeLogger from './logger.js';
 
-const logger = makeLogger(process.env.DEBUG_LOG === '1');
+const logger = makeLogger('[SERVICE_WORKER]', process.env.REACT_APP_DEBUG_LOG === '1');
 
 /**
  * A cache first strategy custom variant.

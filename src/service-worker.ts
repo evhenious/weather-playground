@@ -36,7 +36,7 @@ registerRoute(
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used entries are removed.
       new ExpirationPlugin({
-        maxAgeSeconds: 60, //60 * 15, // 15 min to keep weather response
+        maxAgeSeconds: 60 * 15, // 15 min to keep weather response
         maxEntries: 5
       }),
     ],
