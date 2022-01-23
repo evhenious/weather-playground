@@ -24,9 +24,12 @@ const WeatherMain: React.FC<Props> = ({ data }) => {
     <div className='grid grid-cols-2'>
       <div id='data' className='pl-4'>
         <div>{currentDate}</div>
-        <div className='py-3 text-7xl flex'>
-          <ThermoIcon className='relative top-1 -left-5' />
-          {`${temp}${symbol}`}
+        <div className='py-3 text-6xl flex justify-left'>
+          <ThermoIcon className='relative top-1' />
+          <span className='flex'>
+            {temp}
+            <span className='text-4xl align-top'>{symbol}</span>
+          </span>
         </div>
         <div>{`Feels like ${tempFeelsLike}${symbol}`}</div>
       </div>
