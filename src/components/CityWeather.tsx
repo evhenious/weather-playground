@@ -7,7 +7,10 @@ import { WeatherTab } from './WeatherTab';
 
 // The idea of this type - to not be locked on current CityWeatherResolver class,
 // just on key point of fetcher method availability
-type WeatherResolver = { fetchCityWeather: (city: City) => Promise<Weather | undefined> };
+type WeatherResolver = {
+  cachedWeather: Weather | null;
+  fetchCityWeather: (city: City) => Promise<Weather | null>
+};
 
 interface Props {
   city: City;
@@ -23,14 +26,23 @@ const fetchCityWeather = async (city: City, resolver: WeatherResolver, setWeathe
  * Component responsible for showing city weather
  */
 const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
-  const [weather, setWeather] = useState<Weather | null>(null);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [weather, setWeather] = useState<Weather | null>(cityWeatherResolver.cachedWeather);
 
   useEffect(() => {
-    fetchCityWeather(city, cityWeatherResolver, setWeather);
+    setIsFetching(true);
+
+    const setFetchedWeather = (data: Weather | null) => {
+      setIsFetching(false);
+      setWeather(data);
+    };
+
+    fetchCityWeather(city, cityWeatherResolver, setFetchedWeather);
   }, [city, cityWeatherResolver]);
 
   return (
     <div className='px-5 py-10 gap-y-5 flex flex-col text-gray-50'>
+      {isFetching && weather ? <WeatherTab label='Fetching Weather Update...' /> : false}
       {!weather ? (
         <WeatherTab label='Weather is Not Available...' />
       ) : (

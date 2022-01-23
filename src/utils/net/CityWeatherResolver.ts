@@ -1,22 +1,33 @@
 import { City, Weather, WeatherResponse } from '../../types';
+import { dataStorage } from '../storage/dataStorage';
 import Fetcher from './Fetcher';
 
+const localStorageCacheKey = 'weather';
+
 class CityWeatherResolver extends Fetcher {
-  public async fetchCityWeather(city: City): Promise<Weather | undefined> {
+  public cachedWeather: Weather | null = null;
+
+  constructor(baseUrl: string, ...rest: any) {
+    super(baseUrl, ...rest);
+    this.cachedWeather = dataStorage.getData<Weather>(localStorageCacheKey);
+  }
+
+  public async fetchCityWeather(city: City): Promise<Weather | null> {
     const params = {
       q: `${city.name},${city.countryCode}`,
       units: 'metric',
     };
 
-    let resp: WeatherResponse | undefined;
+    let resp: WeatherResponse | null = null;
 
     try {
       resp = await this.get<WeatherResponse>('/data/2.5/weather', params);
+      resp && dataStorage.saveData(localStorageCacheKey, resp.data);
     } catch (err) {
       console.error('Cannot fetch city weather', err);
     }
 
-    return resp ? resp.data : resp;
+    return resp ? resp.data : null;
   }
 }
 
@@ -25,7 +36,7 @@ export default CityWeatherResolver;
 /*
 const resp = {
   coord: { lon: 24.0232, lat: 49.8383 },
-  weather: [{ id: 804, main: 'Clouds', description: 'overcast clouds', icon: '04n' }], <-------------- UNPROCESSED FOR NOW
+  weather: [{ id: 804, main: 'Clouds', description: 'overcast clouds', icon: '04n' }],
   base: 'stations',
   main: { temp: 7.17, feels_like: 5.11, temp_min: 6.4, temp_max: 7.21, pressure: 1025, humidity: 98 },
   visibility: 6000,
