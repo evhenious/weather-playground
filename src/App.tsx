@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { Suspense, useCallback, useState } from 'react';
 import CitySearch from './components/CitySearch';
-import CityWeather from './components/CityWeather';
 import { City } from './types';
 import { getCityNameResolver, getCityWeatherResolver } from './utils/net';
 import { dataStorage } from './utils/storage/dataStorage';
+
+const CityWeather = React.lazy(() => import('./components/CityWeather'));
 
 const cityNameResolver = getCityNameResolver();
 const cityWeatherResolver = getCityWeatherResolver();
@@ -29,7 +30,13 @@ function App() {
         setCurrentCity={setAndSaveCurrentCity}
         cityNameResolver={cityNameResolver}
       />
-      {currentCity ? <CityWeather city={currentCity} cityWeatherResolver={cityWeatherResolver} /> : false}
+      {currentCity ? (
+        <Suspense fallback="">
+          <CityWeather city={currentCity} cityWeatherResolver={cityWeatherResolver} />
+        </Suspense>
+      ) : (
+        false
+      )}
     </div>
   );
 }
