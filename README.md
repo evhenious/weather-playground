@@ -1,4 +1,6 @@
-# Simple weatcher app for selected city.
+# TinyWeather - Simple weather app
+
+Can fetch and dislay current weather conditions for selected city.
 Installable PWA with network data cache.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
