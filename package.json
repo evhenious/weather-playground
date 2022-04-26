@@ -19,10 +19,10 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "build:api && craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "build:api": "./node_modules/.bin/esbuild ./api_src/geo.js --outfile=./api/geo.js --bundle --minify --platform=node --target=node16"
+    "build:api": "./node_modules/.bin/esbuild ./api_src/geo.js --outfile=./api/geo.js --minify --platform=node --target=node16"
   },
   "eslintConfig": {
     "extends": [
