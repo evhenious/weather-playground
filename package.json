@@ -22,7 +22,7 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "build:api": "./node_modules/.bin/esbuild ./api_src/geo.js --outfile=./api/geo.js --minify --platform=node --target=node16"
+    "build:api": "esbuild ./api_src/geo.js --outfile=./api/geo.js --minify --platform=node --target=node16"
   },
   "eslintConfig": {
     "extends": [
