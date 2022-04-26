@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "build:api && craco build",
+    "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
     "build:api": "./node_modules/.bin/esbuild ./api_src/geo.js --outfile=./api/geo.js --minify --platform=node --target=node16"
