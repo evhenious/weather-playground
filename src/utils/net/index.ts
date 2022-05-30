@@ -1,15 +1,14 @@
 import CityNameResolver from './CityNameResolver';
 import CityWeatherResolver from './CityWeatherResolver';
-import { buildLocalRequest, buildRequest } from './cityResolverParamBuilders';
+import { buildRequest } from './cityResolverParamBuilders';
 
 /**
  * Factory method
  */
 const getCityNameResolver = () => {
   const baseUrl = process.env.REACT_APP_GEODB_BASE_URL || '';
-  const isLocal = process.env.NODE_ENV === 'development';
 
-  return new CityNameResolver(baseUrl, isLocal ? buildLocalRequest : buildRequest);
+  return new CityNameResolver(baseUrl, buildRequest);
 };
 
 /**
