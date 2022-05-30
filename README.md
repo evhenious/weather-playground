@@ -10,6 +10,11 @@ But tweaked with CRACO scipts to overrade some settings and make available Tailw
 
 In the project directory, you can run:
 
+### `npm start:vercel`
+
+Runs development mode Vercel CLI, allows functions from `/api` catalog to run the same way as on Prod (Vercel Serverless).
+Proven to be working on Vercel CLI 24.2.4 (install globally!)
+
 ### `npm start`
 
 Runs the app in the development mode.\
@@ -22,6 +27,10 @@ You will also see any lint errors in the console.
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `build:api`
+
+minifies geo apiand prepares to deploy
 
 ### `npm run build`
 

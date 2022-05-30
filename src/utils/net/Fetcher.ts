@@ -1,26 +1,41 @@
 import axios, { AxiosInstance } from 'axios';
 
-type ApiKey = {
-  paramName: string;
-  key: string;
+export type Defaults = {
+  params?: { [key: string]: any };
 };
 
 abstract class Fetcher {
-  private fetchInstance: AxiosInstance;
+  private apiService: AxiosInstance;
 
-  constructor(protected baseUrl: string, protected apiKey?: ApiKey) {
-    this.fetchInstance = axios.create({
+  /**
+   * @param baseUrl base URL for a service this fetcher will be attached to
+   * @param defaultReqParams to be attached to all requests fromthis fetcher
+   */
+  constructor(protected baseUrl: string, defaults: Defaults = {}) {
+    this.apiService = axios.create({
       baseURL: this.baseUrl,
     });
+
+    // default params attached to each request
+    this.apiService.defaults.params = {
+      ...defaults.params,
+    };
   }
 
+  /**
+   * Calls service endpoint
+   *
+   * @param url API url to call, will be attached to baseUrl supplied in constructor
+   * @param requestParams API request parameters
+   *
+   * @returns {Promise<T>}
+   */
   protected get<T>(url: string, requestParams: { [key: string]: string | number | boolean }): Promise<T> {
     const params = {
       ...requestParams,
-      ...(this.apiKey ? { [this.apiKey.paramName]: this.apiKey.key } : {}),
     };
 
-    return this.fetchInstance.get(url, { params });
+    return this.apiService.get(url, { params });
   }
 }
 

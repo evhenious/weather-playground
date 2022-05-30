@@ -17,12 +17,11 @@ const getCityNameResolver = () => {
 const getCityWeatherResolver = () => {
   const baseUrl = process.env.REACT_APP_WEATHER_BASE_URL || '';
 
-  const apiKey = {
-    paramName: 'appid',
-    key: process.env.REACT_APP_OPENWEATHER_API_KEY || '',
+  const params = {
+    appid: process.env.REACT_APP_OPENWEATHER_API_KEY || '',
   };
 
-  return new CityWeatherResolver(baseUrl, apiKey);
+  return new CityWeatherResolver(baseUrl, { params });
 };
 
 export { getCityNameResolver, getCityWeatherResolver };
