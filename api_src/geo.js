@@ -23,7 +23,7 @@ async function processRequest(req, res) {
 
 function getGeoData(apiUrl = '', params = '') {
   const url = `${GEO_DB_BASE_URL}${apiUrl}${params}`;
-  console.log('Calling:', url);
+  console.log('/api/geo: Calling:', url);
 
   return new Promise((resolve, reject) => {
     http
