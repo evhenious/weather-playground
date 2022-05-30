@@ -19,7 +19,7 @@ class CityNameResolver extends Fetcher {
       console.error('Cannot fetch cities', err);
     }
 
-    return resp ? resp.data.data : [];
+    return resp?.data?.data || [];
   }
 }
 

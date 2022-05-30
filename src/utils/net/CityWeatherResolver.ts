@@ -1,14 +1,14 @@
 import { City, Weather, WeatherResponse } from '../../types';
 import { dataStorage } from '../storage/dataStorage';
-import Fetcher from './Fetcher';
+import Fetcher, { Defaults } from './Fetcher';
 
 const localStorageCacheKey = 'weather';
 
 class CityWeatherResolver extends Fetcher {
   public cachedWeather: Weather | null = null;
 
-  constructor(baseUrl: string, ...rest: any) {
-    super(baseUrl, ...rest);
+  constructor(baseUrl: string, defaults: Defaults = {}) {
+    super(baseUrl, defaults);
     this.cachedWeather = dataStorage.getData<Weather>(localStorageCacheKey);
   }
 
