@@ -19,13 +19,14 @@ const WeatherMain: React.FC<Props> = ({ data }) => {
 
   const temp = asTemp(main.temp);
   const tempFeelsLike = asTemp(main.feels_like);
+  const tempColor = temp < 0 ? 'text-blue-200' : 'text-yellow-200';
 
   return (
     <div className='grid grid-cols-2'>
       <div id='data' className='pl-4'>
         <div>{currentDate}</div>
         <div className='py-3 text-6xl flex justify-left'>
-          <ThermoIcon className='relative top-1' />
+          <ThermoIcon className={`relative top-1 ${tempColor}`} />
           <span className='flex'>
             {temp}
             <span className='text-4xl align-top'>{symbol}</span>

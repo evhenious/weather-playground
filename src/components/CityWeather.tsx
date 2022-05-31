@@ -62,7 +62,7 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
           <WeatherTab label='Sunlight Time' icon='sunlight'>
             <WeatherRow label='Sunrise' data={weather.sys.sunrise} type={DataType.time} />
             <WeatherRow label='Sunset' data={weather.sys.sunset} type={DataType.time} />
-            <WeatherRow label='Daylight' data={weather.sys.sunrise - weather.sys.sunset} type={DataType.time} />
+            <WeatherRow label='Daylight' data={weather.sys.sunset - weather.sys.sunrise} type={DataType.timespan} />
           </WeatherTab>
         </>
       )}

@@ -5,6 +5,7 @@ export enum DataType {
   pressure = 'press',
   temp = 'temp',
   time = 'time',
+  timespan = 'timesp',
   speed = 'speed'
 }
 
@@ -16,9 +17,10 @@ export const processors = {
   [DataType.distance]: (data: number) => new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(data),
   [DataType.humidity]: (data: number) => data,
   [DataType.pressure]: (data: number) => data / 1000,
-  [DataType.temp]: (data: number) => Math.round(data),
+  [DataType.temp]: (degrees: number) => Math.round(degrees),
   [DataType.time]: (data: number) => new Intl.DateTimeFormat('en-GB', timeOptions).format(new Date(data * 1000)),
-  [DataType.speed]: (data: number) => Math.round(data),
+  [DataType.timespan]: (seconds: number) => (seconds / 60 / 60).toFixed(1),
+  [DataType.speed]: (value: number) => Math.round(value),
 };
 
 export const additionals = {
@@ -28,5 +30,6 @@ export const additionals = {
   [DataType.pressure]: ' mBar',
   [DataType.temp]: '°C',
   [DataType.time]: '',
+  [DataType.timespan]: ' hrs',
   [DataType.speed]: ' m/s'
 };
