@@ -18,14 +18,16 @@ const logger = makeLogger('[SERVICE_WORKER]', process.env.REACT_APP_DEBUG_LOG ==
 class CustomCacheFirst {
   /**
    * @param {Object} options
-   * @param {string} options.cacheName Cache name to store and retrieve
-   * requests. Defaults to cache names provided by
+   * @param {string} options.cacheName Cache name to store and retrieve requests. Defaults to cache names provided by
    * [workbox-core]{@link module:workbox-core.cacheNames}.
+   *
    * @param {Array<Object>} options.plugins [Plugins]{@link https://developers.google.com/web/tools/workbox/guides/using-plugins}
    * to use in conjunction with this caching strategy.
+   *
    * @param {Object} options.fetchOptions Values passed along to the
    * [`init`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
    * of all fetch() requests made by this strategy.
+   *
    * @param {Object} options.matchOptions [`CacheQueryOptions`](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions)
    */
   constructor(options = {}) {
@@ -36,9 +38,9 @@ class CustomCacheFirst {
 
     this._emergencyCacheName = 'last-chance-weather-cache'; // suppose to not be customized
   }
+
   /**
-   * This method will perform a request strategy and follows an API that
-   * will work with the
+   * This method will perform a request strategy and follows an API that will work with the
    * [Workbox Router]{@link module:workbox-routing.Router}.
    *
    * @param {Object} options
@@ -61,7 +63,7 @@ class CustomCacheFirst {
       plugins: this._plugins,
     };
 
-    // Check in the cache, for starters
+    // Check in the first-step cache, for starters
     let response = await cacheWrapper.match({
       cacheName: this._cacheName,
       request,
@@ -70,15 +72,21 @@ class CustomCacheFirst {
       plugins: this._plugins,
     });
 
+    console.log('first cache', response, response?.headers);
+
     let error;
 
     if (!response) {
       logger.log('No response in a cache, going to network...');
       try {
         response = await this._getFromNetwork(request, event);
+        console.log('from network', response.clone());
+
         logger.log('Got fresh data from the network!');
       } catch (err) {
         console.log('No response from the network, checking in the last-chance cache before returning an error...');
+
+        // What is in last chance cache?
         response = await cacheWrapper.match({
           cacheName: this._emergencyCacheName,
           request,
@@ -86,6 +94,9 @@ class CustomCacheFirst {
           matchOptions: this._matchOptions,
           plugins: [],
         });
+
+        console.log('last cache', response.clone());
+
 
         if (response) {
           logger.log('Got data from the last-chance cache.');
@@ -148,6 +159,7 @@ class CustomCacheFirst {
     const { request, response } = requestData;
 
     const responseClone = response.clone();
+    console.log('resp clone', response)
     const cachePutPromise = cacheWrapper.put({
       request,
       response: responseClone,

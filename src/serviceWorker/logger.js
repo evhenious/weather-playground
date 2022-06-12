@@ -2,10 +2,10 @@ export default function makeLogger(prefix = '', shouldLog = false) {
   const prefixed = withPrefix(prefix);
 
   return {
-    log: shouldLog ? prefixed(console.log) : () => null,
-    info: prefixed(console.info),
-    warn: prefixed(console.warn),
-    error: prefixed(console.error),
+    log: shouldLog ? prefixed(console.log.bind(console)) : () => null,
+    info: prefixed(console.info.bind(console)),
+    warn: prefixed(console.warn.bind(console)),
+    error: prefixed(console.error.bind(console)),
   };
 }
 
