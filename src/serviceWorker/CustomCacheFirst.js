@@ -16,6 +16,8 @@ const logger = makeLogger('[SERVICE_WORKER]', process.env.REACT_APP_DEBUG_LOG ==
  * @memberof module:workbox-strategies
  */
 class CustomCacheFirst {
+  #lastSyncTime;
+
   /**
    * @param {Object} options
    * @param {string} options.cacheName Cache name to store and retrieve requests. Defaults to cache names provided by
@@ -37,6 +39,7 @@ class CustomCacheFirst {
     this._matchOptions = options.matchOptions;
 
     this._emergencyCacheName = 'last-chance-weather-cache'; // suppose to not be customized
+    this.#lastSyncTime = 0;
   }
 
   /**
@@ -72,12 +75,15 @@ class CustomCacheFirst {
       plugins: this._plugins,
     });
 
-    console.log('first cache', response, response?.headers);
+    logger.log('first cache', response);
 
     let error;
 
-    if (!response) {
-      logger.log('No response in a cache, going to network...');
+    // const isCacheTooOld = (Date.now() - this.#lastSyncTime) / (1000 * 3600) >= 2;
+    logger.info('last sync time', this.#lastSyncTime);
+    const isCacheTooOld = (Date.now() - this.#lastSyncTime) / (1000 * 60) >= 2;
+    if (!response || isCacheTooOld) {
+      logger.log(`${isCacheTooOld ? 'Cache is old' : 'No response in a cache'}, going to network...`);
       try {
         response = await this._getFromNetwork(request, event);
         console.log('from network', response.clone());
@@ -141,6 +147,7 @@ class CustomCacheFirst {
       plugins: this._plugins,
     });
 
+    this.#lastSyncTime = Date.now();
     return response;
   }
 
