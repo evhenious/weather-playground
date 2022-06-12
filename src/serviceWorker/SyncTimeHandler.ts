@@ -1,12 +1,22 @@
-import { WorkboxPlugin, CachedResponseWillBeUsedCallbackParam } from 'workbox-core/types.js';
+import {
+  WorkboxPlugin,
+  CachedResponseWillBeUsedCallbackParam,
+  CacheDidUpdateCallbackParam,
+} from 'workbox-core/types.js';
 
 // Need to allow worker to use local storage
 const bc = new BroadcastChannel('synctube');
 
 class SyncTimeHandler implements WorkboxPlugin {
+  constructor(private cacheNameToWatch: string) {}
+
   async cachedResponseWillBeUsed(param: CachedResponseWillBeUsedCallbackParam) {
     const { cacheName, cachedResponse } = param;
+
     console.log('cacheName', cacheName);
+    if (cacheName !== this.cacheNameToWatch) {
+      return cachedResponse;
+    }
 
     const lastSyncTime = await new Promise<number>((res) => {
       const eventHandler = ({ data }: any) => {
@@ -16,6 +26,7 @@ class SyncTimeHandler implements WorkboxPlugin {
         }
       };
 
+      console.log('Gettig last sync time');
       bc.addEventListener('message', eventHandler);
       bc.postMessage({ command: 'getLastSync' });
     });
@@ -29,6 +40,18 @@ class SyncTimeHandler implements WorkboxPlugin {
     }
 
     return cachedResponse;
+  }
+
+  async cacheDidUpdate(param: CacheDidUpdateCallbackParam) {
+    const { cacheName } = param;
+
+    console.log('cacheName', cacheName);
+    if (cacheName !== this.cacheNameToWatch) {
+      return;
+    }
+
+    console.log('Saving last sync time');
+    bc.postMessage({ command: 'saveLastSync', payload: Date.now() });
   }
 }
 

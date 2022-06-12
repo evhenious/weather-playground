@@ -39,7 +39,7 @@ registerRoute(
         maxAgeSeconds: 60 * 15, // 15 min to keep weather response
         maxEntries: 5
       }),
-      new SyncTimeHandler()
+      new SyncTimeHandler('weather-cache')
     ],
   })
 );
