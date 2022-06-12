@@ -9,6 +9,18 @@ const CityWeather = React.lazy(() => import('./components/CityWeather'));
 const cityNameResolver = getCityNameResolver();
 const cityWeatherResolver = getCityWeatherResolver();
 
+const bc = new BroadcastChannel('synctube');
+bc.onmessage = ({ data }) => {
+  if (data.command === 'getLastSync') {
+    const ts = dataStorage.getData('lastSyncAt');
+    bc.postMessage({ command: 'setLastSync', payload: ts });
+  }
+
+  if (data.command === 'saveLastSync') {
+    dataStorage.saveData('lastSyncAt', data.payload);
+  }
+}
+
 const dataStorageKey = 'city';
 
 const fallbackIcon = <img src='logo192.png' alt='...loading' className='mr-auto ml-auto' />;

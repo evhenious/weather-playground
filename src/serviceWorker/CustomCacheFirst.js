@@ -39,7 +39,6 @@ class CustomCacheFirst {
     this._matchOptions = options.matchOptions;
 
     this._emergencyCacheName = 'last-chance-weather-cache'; // suppose to not be customized
-    this.#lastSyncTime = 0;
   }
 
   /**
@@ -79,11 +78,8 @@ class CustomCacheFirst {
 
     let error;
 
-    // const isCacheTooOld = (Date.now() - this.#lastSyncTime) / (1000 * 3600) >= 2;
-    logger.info('last sync time', this.#lastSyncTime);
-    const isCacheTooOld = (Date.now() - this.#lastSyncTime) / (1000 * 60) >= 2;
-    if (!response || isCacheTooOld) {
-      logger.log(`${isCacheTooOld ? 'Cache is old' : 'No response in a cache'}, going to network...`);
+    if (!response) {
+      logger.log('No response in a cache, going to network...');
       try {
         response = await this._getFromNetwork(request, event);
         console.log('from network', response.clone());
