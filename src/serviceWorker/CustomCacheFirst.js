@@ -4,20 +4,17 @@ import { fetchWrapper } from 'workbox-core/_private/fetchWrapper.js';
 import { WorkboxError } from 'workbox-core/_private/WorkboxError.js';
 import makeLogger from './logger.js';
 
-const logger = makeLogger('[SERVICE_WORKER]', process.env.REACT_APP_DEBUG_LOG === '1');
+const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP_DEBUG_LOG === '1');
 
 /**
  * A cache first strategy custom variant.
  * Does will return cached response even if responce is expired (when no network).
  *
- * If the network request fails, and there is no cache match, this will throw
- * a `WorkboxError` exception.
+ * If the network request fails, and there is no cache match, this will throw a `WorkboxError` exception.
  *
  * @memberof module:workbox-strategies
  */
 class CustomCacheFirst {
-  #lastSyncTime;
-
   /**
    * @param {Object} options
    * @param {string} options.cacheName Cache name to store and retrieve requests. Defaults to cache names provided by
@@ -74,7 +71,7 @@ class CustomCacheFirst {
       plugins: this._plugins,
     });
 
-    logger.log('first cache', response);
+    logger.log('first cache hit', !!response);
 
     let error;
 
@@ -82,11 +79,9 @@ class CustomCacheFirst {
       logger.log('No response in a cache, going to network...');
       try {
         response = await this._getFromNetwork(request, event);
-        console.log('from network', response.clone());
-
         logger.log('Got fresh data from the network!');
       } catch (err) {
-        console.log('No response from the network, checking in the last-chance cache before returning an error...');
+        logger.info('No response from the network, checking in the last-chance cache before returning an error...');
 
         // What is in last chance cache?
         response = await cacheWrapper.match({
@@ -96,9 +91,6 @@ class CustomCacheFirst {
           matchOptions: this._matchOptions,
           plugins: [],
         });
-
-        console.log('last cache', response.clone());
-
 
         if (response) {
           logger.log('Got data from the last-chance cache.');
@@ -143,7 +135,6 @@ class CustomCacheFirst {
       plugins: this._plugins,
     });
 
-    this.#lastSyncTime = Date.now();
     return response;
   }
 
@@ -162,7 +153,6 @@ class CustomCacheFirst {
     const { request, response } = requestData;
 
     const responseClone = response.clone();
-    console.log('resp clone', response)
     const cachePutPromise = cacheWrapper.put({
       request,
       response: responseClone,
