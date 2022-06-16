@@ -3,13 +3,13 @@ import {
   CachedResponseWillBeUsedCallbackParam,
   WorkboxPlugin
 } from 'workbox-core/types.js';
-import { BroadcastData, BROADCAST_COMMANDS, makeGetSyncTimeMsg, makeSaveSyncTimeMsg } from '../globals';
+import { BC_SYNC_CHANNEL, BroadcastData, BROADCAST_COMMANDS, makeGetSyncTimeMsg, makeSaveSyncTimeMsg } from '../globals';
 import makeLogger from './logger';
 
 const logger = makeLogger('[SERVICE_WORKER|SYNC_TIME_HANDLER]', process.env.REACT_APP_DEBUG_LOG === '1');
 
 // Need to allow worker to use local storage
-const bc = new BroadcastChannel('synctube');
+const bc = new BroadcastChannel(BC_SYNC_CHANNEL);
 
 class SyncTimeHandler implements WorkboxPlugin {
   constructor(private cacheNameToWatch: string) {}
@@ -34,7 +34,7 @@ class SyncTimeHandler implements WorkboxPlugin {
       const eventHandler = ({ data }: { data: BroadcastData }) => {
         if (data.command === BROADCAST_COMMANDS.setLastSync) {
           bc.removeEventListener('message', eventHandler);
-          res(+(data?.payload || 0));
+          res(+(data.payload || 0));
         }
       };
 

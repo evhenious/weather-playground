@@ -1,3 +1,5 @@
+export const BC_SYNC_CHANNEL = 'synctube';
+
 export enum BROADCAST_COMMANDS {
   getLastSync = 'getLastSync',
   saveLastSync = 'saveLastSync',

@@ -1,5 +1,5 @@
 import React, { Suspense, useCallback, useState } from 'react';
-import { BroadcastData, BROADCAST_COMMANDS, makeSetSyncTimeMsg } from './globals';
+import { BC_SYNC_CHANNEL, BroadcastData, BROADCAST_COMMANDS, makeSetSyncTimeMsg } from './globals';
 import { City } from './types';
 import { getCityNameResolver, getCityWeatherResolver } from './utils/net';
 import { dataStorage } from './utils/storage/dataStorage';
@@ -11,18 +11,18 @@ const cityNameResolver = getCityNameResolver();
 const cityWeatherResolver = getCityWeatherResolver();
 
 //? optimise here below
-const storageKey = 'lastSyncAt';
-const bc = new BroadcastChannel('synctube');
+const syncTimeStorageKey = 'lastSyncAt';
+const bc = new BroadcastChannel(BC_SYNC_CHANNEL);
 bc.onmessage = ({ data }: { data: BroadcastData }) => {
   const { command, payload } = data;
 
   if (command === BROADCAST_COMMANDS.getLastSync) {
-    const ts = dataStorage.getData<number>(storageKey) || 0;
+    const ts = dataStorage.getData<number>(syncTimeStorageKey) || 0;
     bc.postMessage(makeSetSyncTimeMsg(ts));
   }
 
   if (command === BROADCAST_COMMANDS.saveLastSync) {
-    dataStorage.saveData(storageKey, payload);
+    dataStorage.saveData(syncTimeStorageKey, payload);
   }
 }
 
