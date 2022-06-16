@@ -14,6 +14,7 @@ import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
 import { CustomCacheFirst } from './serviceWorker/CustomCacheFirst'
+import { SyncTimeHandler } from './serviceWorker/SyncTimeHandler';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -33,12 +34,12 @@ registerRoute(
   new CustomCacheFirst({
     cacheName: 'weather-cache',
     plugins: [
-      // Ensure that once this runtime cache reaches a maximum size the
-      // least-recently used entries are removed.
+      // Ensure that once this runtime cache reaches a maximum size the least-recently used entries are removed.
       new ExpirationPlugin({
         maxAgeSeconds: 60 * 15, // 15 min to keep weather response
         maxEntries: 5
       }),
+      new SyncTimeHandler('weather-cache')
     ],
   })
 );
