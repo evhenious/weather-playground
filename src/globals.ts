@@ -8,7 +8,7 @@ export enum BROADCAST_COMMANDS {
 
 export type BroadcastData = {
   command: BROADCAST_COMMANDS;
-  payload?: string | number;
+  payload?: number;
 };
 
 export const makeGetSyncTimeMsg = () => {

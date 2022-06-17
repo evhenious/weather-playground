@@ -3,13 +3,14 @@ import {
   CachedResponseWillBeUsedCallbackParam,
   WorkboxPlugin
 } from 'workbox-core/types.js';
-import { BC_SYNC_CHANNEL, BroadcastData, BROADCAST_COMMANDS, makeGetSyncTimeMsg, makeSaveSyncTimeMsg } from '../globals';
+import { BC_SYNC_CHANNEL } from '../globals';
+import { BroadcastHelper } from './BroadcastHelper';
 import makeLogger from './logger';
 
 const logger = makeLogger('[SERVICE_WORKER|SYNC_TIME_HANDLER]', process.env.REACT_APP_DEBUG_LOG === '1');
 
 // Need to allow worker to use local storage
-const bc = new BroadcastChannel(BC_SYNC_CHANNEL);
+const broadcastHelper = new BroadcastHelper(BC_SYNC_CHANNEL);
 
 class SyncTimeHandler implements WorkboxPlugin {
   constructor(private cacheNameToWatch: string) {}
@@ -30,20 +31,8 @@ class SyncTimeHandler implements WorkboxPlugin {
       return cachedResponse;
     }
 
-    const lastSyncTime = await new Promise<number>((res) => {
-      const eventHandler = ({ data }: { data: BroadcastData }) => {
-        if (data.command === BROADCAST_COMMANDS.setLastSync) {
-          bc.removeEventListener('message', eventHandler);
-          res(+(data.payload || 0));
-        }
-      };
-
-      logger.info('Gettig last cache sync time...');
-      bc.addEventListener('message', eventHandler);
-      bc.postMessage(makeGetSyncTimeMsg());
-    });
-
-    const isCacheTooOld = (Date.now() - lastSyncTime) / (1000 * 3600) >= 2;
+    const lastSyncTime = await broadcastHelper.getlastSyncTime();
+    const isCacheTooOld = (Date.now() - lastSyncTime) / (1000 * 3600) >= 2; // older than 2 hours -> refresh on open
     logger.info('Last sync time we have', lastSyncTime);
     if (isCacheTooOld) {
       logger.info('Old cache, going to network');
@@ -68,8 +57,7 @@ class SyncTimeHandler implements WorkboxPlugin {
       return;
     }
 
-    logger.log('Saving last sync time...');
-    bc.postMessage(makeSaveSyncTimeMsg());
+    broadcastHelper.saveCurrentsyncTime();
   }
 }
 
