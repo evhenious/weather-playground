@@ -1,16 +1,17 @@
-const http = require('http');
+import http from 'http';
+import { GeoDbRequestParams } from "./types";
 
-const { GEO_DB_BASE_URL } = process.env;
+const { GEO_DB_BASE_URL = '' } = process.env;
 
 async function processRequest(req, res) {
-  const { url: apiUrl, params = {} } = req.query;
+  const { url: apiUrl, params = '' } = req.query;
 
-  const parsedParams = JSON.parse(params);
+  const parsedParams: GeoDbRequestParams = JSON.parse(params);
 
-  const reqParams = Object.keys(parsedParams).reduce((acc, key) => {
-    const separator = acc.length ? '&' : '?';
-    return (acc += `${separator}${key}=${parsedParams[key]}`);
-  }, '');
+  const reqParams = new URLSearchParams();
+  Object.entries(parsedParams).forEach(([key, val]) => {
+    reqParams.set(key, val as string);
+  });
 
   try {
     const resp = await getGeoData(apiUrl, reqParams);
@@ -21,8 +22,11 @@ async function processRequest(req, res) {
   }
 }
 
-function getGeoData(apiUrl = '', params = '') {
-  const url = `${GEO_DB_BASE_URL}${apiUrl}${params}`;
+/**
+ * Calls GeoDB endpoint. Generic thing.
+ */
+function getGeoData(endpoint = '', params: URLSearchParams) {
+  const url = `${GEO_DB_BASE_URL}${endpoint}?${params}`;
   console.log('/api/geo: Calling:', url);
 
   return new Promise((resolve, reject) => {

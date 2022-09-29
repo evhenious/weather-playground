@@ -1,10 +1,8 @@
-import { City, CityResponse } from '../../types';
+import { City, CityResponse, GeoParamBuilder } from '../../types';
 import Fetcher from './Fetcher';
 
-type ParamBuilder = (arg0: string) => [string, { [key: string]: string | number | boolean }];
-
 class CityNameResolver extends Fetcher {
-  constructor(baseUrl: string, private paramBuilder: ParamBuilder) {
+  constructor(baseUrl: string, private paramBuilder: GeoParamBuilder) {
     super(baseUrl);
   }
 

@@ -1,3 +1,9 @@
+import { GeoParamBuilder } from "../../types";
+
+const GEODB_ENDPOINTS = {
+  getCity: process.env.REACT_APP_GEO_EP_GET_CITY || ''
+}
+
 const baseReqParams = {
   hateoasMode: false,
   limit: 5,
@@ -5,16 +11,16 @@ const baseReqParams = {
 };
 
 /**
- * Request param builder for deployed app requests to resolve city name
+ * Request param builder to resolve city name
  */
-const buildRequest = (cityNamePart: string): [string, { [key: string]: string }] => {
+const buildRequest: GeoParamBuilder = (cityNamePart) => {
   const geoReqParams = {
     ...baseReqParams,
     namePrefix: cityNamePart,
   };
 
   const reqParams = {
-    url: '/v1/geo/cities',
+    url: GEODB_ENDPOINTS.getCity,
     params: JSON.stringify(geoReqParams),
   };
 
