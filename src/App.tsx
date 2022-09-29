@@ -14,7 +14,7 @@ const cityWeatherResolver = getCityWeatherResolver();
 new BroadcastStorageHelper(BC_SYNC_CHANNEL).startListening();
 
 const dataStorageKey = 'city';
-const fallbackIconBig = <img src='logo512.png' alt='No City Selected' className='mr-auto ml-auto mix-blend-soft-light w-3/4 relative top-32' />;
+const fallbackIconBig = <img src='logo512.png' alt='No City Selected' className='mr-auto ml-auto w-3/4 max-w-min mix-blend-soft-light relative top-32' />;
 
 function App() {
   const savedCity = dataStorage.getData<City>(dataStorageKey);
