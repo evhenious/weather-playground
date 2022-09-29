@@ -14,8 +14,7 @@ const cityWeatherResolver = getCityWeatherResolver();
 new BroadcastStorageHelper(BC_SYNC_CHANNEL).startListening();
 
 const dataStorageKey = 'city';
-
-const fallbackIcon = <img src='logo192.png' alt='...loading' className='mr-auto ml-auto' />;
+const fallbackIconBig = <img src='logo512.png' alt='No City Selected' className='mr-auto ml-auto mix-blend-soft-light w-3/4 relative top-32' />;
 
 function App() {
   const savedCity = dataStorage.getData<City>(dataStorageKey);
@@ -31,7 +30,7 @@ function App() {
 
   return (
     <div className='bg-gradient-to-b from-black to-gray-300 min-h-screen'>
-      <Suspense fallback={fallbackIcon}>
+      <Suspense fallback={'...loading'}>
         <CitySearch
           currentCity={currentCity}
           setCurrentCity={setAndSaveCurrentCity}
@@ -43,7 +42,7 @@ function App() {
           <CityWeather city={currentCity} cityWeatherResolver={cityWeatherResolver} />
         </Suspense>
       ) : (
-        false
+        fallbackIconBig
       )}
     </div>
   );
