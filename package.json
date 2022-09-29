@@ -20,15 +20,18 @@
   "scripts": {
     "start:vercel": "vercel dev",
     "start": "craco start",
+    "build:api": "esbuild ./api_src/geo.js --outfile=./api/geo.js --minify --platform=node --target=node16",
     "build": "craco build",
     "test": "craco test",
-    "eject": "react-scripts eject",
-    "build:api": "esbuild ./api_src/geo.js --outfile=./api/geo.js --minify --platform=node --target=node16"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "ignorePatterns": [
+      "api"
     ]
   },
   "browserslist": {

@@ -31,8 +31,12 @@ export type Weather = {
     description: string;
     icon: string;
     main: string;
-  }[]
+  }[];
 };
+
+export interface GeoParamBuilder {
+  (cityNamePart: string): [string, { url: string, params: string }];
+}
 
 export type WeatherResponse = {
   data: Weather;

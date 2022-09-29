@@ -3,6 +3,7 @@ import { dataStorage } from '../storage/dataStorage';
 import Fetcher, { Defaults } from './Fetcher';
 
 const localStorageCacheKey = 'weather';
+const getWeatherApiEndpoint = process.env.REACT_APP_WEATHER_EP_GET_WEATHER || '';
 
 class CityWeatherResolver extends Fetcher {
   public cachedWeather: Weather | null = null;
@@ -18,16 +19,16 @@ class CityWeatherResolver extends Fetcher {
       units: 'metric',
     };
 
-    let resp: WeatherResponse | null = null;
+    let resp: WeatherResponse | undefined;
 
     try {
-      resp = await this.get<WeatherResponse>('/data/2.5/weather', params);
+      resp = await this.get<WeatherResponse>(getWeatherApiEndpoint, params);
       resp && dataStorage.saveData(localStorageCacheKey, resp.data);
     } catch (err) {
       console.error('Cannot fetch city weather', err);
     }
 
-    return resp ? resp.data : null;
+    return resp?.data || null;
   }
 }
 
