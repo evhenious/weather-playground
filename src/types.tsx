@@ -1,8 +1,10 @@
 export type City = {
+  id: number;
   city: string;
   country: string;
   countryCode: string;
   name: string;
+  type: string;
 };
 
 export type CityResponse = {
