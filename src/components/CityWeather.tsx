@@ -55,11 +55,11 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
             <WeatherRow label='Pressure' data={weather.main.pressure} type={DataType.pressure} />
             <WeatherRow label='Humidity' data={weather.main.humidity} type={DataType.humidity} />
           </WeatherTab>
-          <WeatherTab label='Wind' icon='wind'>
+          <WeatherTab label='Wind' icon={{ name: 'wind', iconClass: 'text-blue-100' }}>
             <WeatherRow label='Speed' data={weather.wind.speed} type={DataType.speed} />
             <WeatherRow label='Direction' data={weather.wind.deg} />
           </WeatherTab>
-          <WeatherTab label='Sunlight Time' icon='sunlight'>
+          <WeatherTab label='Sunlight Time' icon={{ name: 'sunlight', iconClass: 'text-yellow-100' }}>
             <WeatherRow label='Sunrise' data={weather.sys.sunrise} type={DataType.time} />
             <WeatherRow label='Sunset' data={weather.sys.sunset} type={DataType.time} />
             <WeatherRow label='Daylight' data={weather.sys.sunset - weather.sys.sunrise} type={DataType.timespan} />
