@@ -12,40 +12,36 @@ interface Props {
 const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameResolver }) => {
   const [cityName, setCityName] = useState<string>(currentCity?.name || '');
   const [cityList, setCityList] = useState<City[]>();
-  const [isCityChosen, setCityChosen] = useState(!!currentCity);
 
-  const selectCity = (index: number) => {
+  const selectCityFromList = (index: number) => {
     if (cityList) {
-      setCityChosen(true);
       setCurrentCity(cityList[index]);
       setCityName(cityList[index].name);
     }
-    setCityList([]);
+    setCityList(undefined);
   };
 
   const cancelCityChange = () => {
-    setCityChosen(true);
-    setCityList([]);
+    setCityList(undefined);
     setCityName(currentCity?.name || '');
   };
 
   const inputHandler = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setCityName(target.value);
-    isCityChosen && setCityChosen(false);
   };
 
   const debouncedSearchHandler = useMemo(
     () =>
       debounce(async (cityName) => {
-        if (cityName.length < 3 || isCityChosen) {
+        if (cityName.length < 3 || cityName === currentCity?.name) {
           return;
         }
 
         const data = await cityNameResolver.fetchCityList(cityName);
         // TODO: show notification if no city found
-        setCityList(data);
+        setCityList(data.filter((item) => item.type === 'CITY'));
       }, 400),
-    [isCityChosen, cityNameResolver]
+    [currentCity?.name, cityNameResolver]
   );
 
   // cleanup for debounced callback on unmount
@@ -89,7 +85,7 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameReso
               {currentCity?.country || 'N/A'}
             </span>
           </div>
-          {cityList?.length ? <CityList data={cityList} onSelect={selectCity} onCancel={cancelCityChange} /> : false}
+          {cityList?.length ? <CityList data={cityList} onSelect={selectCityFromList} onCancel={cancelCityChange} /> : false}
         </div>
       </div>
     </div>
