@@ -29,7 +29,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 // Cache for weather resolver
 registerRoute(
   // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.host.includes('openweathermap'),
+  ({ url }) => url.host.includes('openweathermap') && url.pathname.includes('/weather'),
   // Customize this strategy as needed
   new CustomCacheFirst({
     cacheName: 'weather-cache',

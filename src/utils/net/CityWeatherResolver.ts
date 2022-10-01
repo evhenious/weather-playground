@@ -3,7 +3,11 @@ import { dataStorage } from '../storage/dataStorage';
 import Fetcher, { Defaults } from './Fetcher';
 
 const localStorageCacheKey = 'weather';
-const getWeatherApiEndpoint = process.env.REACT_APP_WEATHER_EP_GET_WEATHER || '';
+
+const WEATHER_API_ENDPOINTS = {
+  getCurrentWeather: process.env.REACT_APP_WEATHER_EP_GET_WEATHER || '',
+  getForecast: process.env.REACT_APP_WEATHER_EP_GET_FORECAST || ''
+}
 
 class CityWeatherResolver extends Fetcher {
   public cachedWeather: Weather | null = null;
@@ -22,10 +26,28 @@ class CityWeatherResolver extends Fetcher {
     let resp: WeatherResponse | undefined;
 
     try {
-      resp = await this.get<WeatherResponse>(getWeatherApiEndpoint, params);
+      resp = await this.get<WeatherResponse>(WEATHER_API_ENDPOINTS.getCurrentWeather, params);
       resp && dataStorage.saveData(localStorageCacheKey, resp.data);
     } catch (err) {
       console.error('Cannot fetch city weather', err);
+    }
+
+    return resp?.data || null;
+  }
+
+  public async fetchForecast(city: City) {
+    const params = {
+      lat: city.latitude,
+      lon: city.longitude,
+      units: 'metric',
+      cnt: 5, // amount of result entries, step is 3 hrs
+    };
+
+    let resp;
+    try {
+      resp = await this.get<WeatherResponse>(WEATHER_API_ENDPOINTS.getForecast, params);
+    } catch (err) {
+      console.error('Cannot fetch weather forecast', err);
     }
 
     return resp?.data || null;
@@ -35,7 +57,7 @@ class CityWeatherResolver extends Fetcher {
 export default CityWeatherResolver;
 
 /*
-const resp = {
+const weatherResp = {
   coord: { lon: 24.0232, lat: 49.8383 },
   weather: [{ id: 804, main: 'Clouds', description: 'overcast clouds', icon: '04n' }],
   base: 'stations',
