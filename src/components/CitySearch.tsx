@@ -64,7 +64,7 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameReso
     <div className='shadow sm:overflow-hidden'>
       <div className='px-4 py-5 bg-gray-200 space-y-6 sm:p-6'>
         <div className='block'>
-          <div className='mt-1 flex shadow-sm'>
+          <div className='flex shadow-sm'>
             <span
               className={`inline-flex items-center px-3 ${radiusLabel} ${grayBorder} border-r-0 ${grayLabeltext}`}
             >

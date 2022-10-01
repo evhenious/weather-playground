@@ -40,7 +40,7 @@ class CityWeatherResolver extends Fetcher {
       lat: city.latitude,
       lon: city.longitude,
       units: 'metric',
-      cnt: 5, // amount of result entries, step is 3 hrs
+      cnt: 8, // amount of result entries, step is 3 hrs
     };
 
     let resp;

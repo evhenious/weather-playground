@@ -5,6 +5,8 @@ export type City = {
   countryCode: string;
   name: string;
   type: string;
+  latitude: number,
+  longitude: number;
 };
 
 export type CityResponse = {
