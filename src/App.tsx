@@ -17,10 +17,10 @@ const dataStorageKey = 'city';
 const fallbackIconBig = <img src='logo512.png' alt='No City Selected' className='mr-auto ml-auto w-3/4 max-w-min mix-blend-soft-light relative top-32' />;
 
 function App() {
-  const savedCity = dataStorage.getData<City>(dataStorageKey);
-  const [currentCity, setCurrentCity] = useState<City | null>(savedCity);
+  const cachedCity = dataStorage.getData<City>(dataStorageKey);
+  const [currentCity, setCurrentCity] = useState<City | null>(cachedCity);
 
-  const setAndSaveCurrentCity = useCallback(
+  const setAndCacheCurrentCity = useCallback(
     (city: City) => {
       dataStorage.saveData(dataStorageKey, city);
       setCurrentCity(city);
@@ -33,7 +33,7 @@ function App() {
       <Suspense fallback={'...loading'}>
         <CitySearch
           currentCity={currentCity}
-          setCurrentCity={setAndSaveCurrentCity}
+          setCurrentCity={setAndCacheCurrentCity}
           cityNameResolver={cityNameResolver}
         />
       </Suspense>
