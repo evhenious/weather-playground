@@ -21,6 +21,7 @@ function App() {
   const cachedCity = dataStorage.getData<City>(dataStorageKey);
   const [currentCity, setCurrentCity] = useState<City | null>(cachedCity);
 
+  // it's here as we need currentCity for many things
   const setAndCacheCurrentCity = useCallback(
     (city: City) => {
       dataStorage.saveData(dataStorageKey, city);

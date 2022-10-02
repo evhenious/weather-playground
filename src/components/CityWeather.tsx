@@ -17,11 +17,6 @@ interface Props {
   cityWeatherResolver: WeatherResolver;
 }
 
-const fetchCityWeather = async (city: City, resolver: WeatherResolver, setWeather: Function) => {
-  const data = await resolver.fetchCityWeather(city);
-  setWeather(data);
-};
-
 const loadingIcon = <img src='logo192_single.png' alt='...loading' className='absolute right-5 w-1/12' />;
 
 /**
@@ -34,12 +29,11 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
   useEffect(() => {
     setIsFetching(true);
 
-    const setFetchedWeather = (data: Weather | null) => {
-      setIsFetching(false);
-      setWeather(data);
-    };
-
-    fetchCityWeather(city, cityWeatherResolver, setFetchedWeather);
+    cityWeatherResolver.fetchCityWeather(city)
+      .then((data) => {
+        setIsFetching(false);
+        setWeather(data);
+      })
   }, [city, cityWeatherResolver]);
 
   return (
