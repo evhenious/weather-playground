@@ -39,7 +39,7 @@ class BroadcastHelper {
    * Sends message with command to save current datetime as last weather sync
    */
   saveSyncTime(cacheName: string) {
-    logger.log('Saving last sync time to the storage...');
+    logger.log(`Saving last sync time for [${cacheName}] to the storage...`);
     this.bc.postMessage(requestSaveSyncTime({
       cacheName,
       timestamp: Date.now(),

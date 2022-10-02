@@ -35,7 +35,7 @@ class CustomCacheFirst {
     this._fetchOptions = options.fetchOptions;
     this._matchOptions = options.matchOptions;
 
-    this._emergencyCacheName = 'last-chance-weather-cache'; // suppose to not be customized
+    this._emergencyCacheName = `last-chance-${options.cacheName}`; // suppose to not be customized
   }
 
   /**
@@ -71,7 +71,7 @@ class CustomCacheFirst {
       plugins: this._plugins,
     });
 
-    logger.log('first cache hit', !!response);
+    logger.log('First cache hit:', !!response);
 
     let error;
 
