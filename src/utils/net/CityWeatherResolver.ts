@@ -1,4 +1,4 @@
-import { City, Weather, WeatherResponse } from '../../types';
+import { City, ForecastResponse, Weather, WeatherResponse } from '../../types';
 import { dataStorage } from '../storage/dataStorage';
 import Fetcher, { Defaults } from './Fetcher';
 
@@ -45,7 +45,7 @@ class CityWeatherResolver extends Fetcher {
 
     let resp;
     try {
-      resp = await this.get<WeatherResponse>(WEATHER_API_ENDPOINTS.getForecast, params);
+      resp = await this.get<ForecastResponse>(WEATHER_API_ENDPOINTS.getForecast, params);
     } catch (err) {
       console.error('Cannot fetch weather forecast', err);
     }

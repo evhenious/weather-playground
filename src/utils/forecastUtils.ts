@@ -1,10 +1,5 @@
-import { TempForecastData } from '../types';
+import { ForecastDataList, TempForecastData } from '../types';
 import { DataType, processors } from './formatUtils';
-
-type ForecastDataList = {
-  main: any;
-  dt_txt: string;
-}[];
 
 /**
  * Transforms forecast data list into x-y values used to draw temp chart

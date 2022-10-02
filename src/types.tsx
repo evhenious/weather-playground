@@ -5,7 +5,7 @@ export type City = {
   countryCode: string;
   name: string;
   type: string;
-  latitude: number,
+  latitude: number;
   longitude: number;
 };
 
@@ -39,11 +39,22 @@ export type Weather = {
 };
 
 export interface GeoParamBuilder {
-  (cityNamePart: string): [string, { url: string, params: string }];
+  (cityNamePart: string): [string, { url: string; params: string }];
 }
 
 export type WeatherResponse = {
   data: Weather;
+};
+
+export type ForecastDataList = {
+  main: any;
+  dt_txt: string;
+}[];
+
+export type ForecastResponse = {
+  data: {
+    list: ForecastDataList;
+  };
 };
 
 type TempChartPoint = {
