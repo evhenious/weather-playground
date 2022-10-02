@@ -1,5 +1,5 @@
 import React, { Suspense, useCallback, useState } from 'react';
-import TempChart from './components/TemperatureChart';
+import Forecast from './components/Forecast';
 import { BC_SYNC_CHANNEL } from './globals';
 import { City } from './types';
 import { BroadcastStorageHelper } from './utils/BroadcastStorageHelper';
@@ -41,7 +41,7 @@ function App() {
       {currentCity ? (
         <Suspense fallback=''>
           <CityWeather city={currentCity} cityWeatherResolver={cityWeatherResolver} />
-          <TempChart city={currentCity} forecastResolver={cityWeatherResolver} />
+          <Forecast city={currentCity} forecastResolver={cityWeatherResolver} />
         </Suspense>
       ) : (
         fallbackIconBig

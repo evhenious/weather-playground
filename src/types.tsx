@@ -45,3 +45,13 @@ export interface GeoParamBuilder {
 export type WeatherResponse = {
   data: Weather;
 };
+
+type TempChartPoint = {
+  x: string;
+  y: number;
+};
+
+export type TempForecastData = {
+  id: string;
+  data: TempChartPoint[];
+}[];
