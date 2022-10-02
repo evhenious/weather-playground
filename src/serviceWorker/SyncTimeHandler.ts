@@ -12,8 +12,13 @@ const logger = makeLogger('[SERVICE_WORKER|SYNC_TIME_HANDLER]', process.env.REAC
 // Need to allow worker to use local storage
 const broadcastHelper = new BroadcastHelper(BC_SYNC_CHANNEL);
 
+type CacheConfig = {
+  name: string;
+  hoursTTL: number;
+};
+
 class SyncTimeHandler implements WorkboxPlugin {
-  constructor(private cacheNameToWatch: string) {}
+  constructor(private cacheToWatch: CacheConfig) {}
 
   /**
    * Checking if cached response is too old for us and if we need immediately refresh from network.
@@ -26,16 +31,18 @@ class SyncTimeHandler implements WorkboxPlugin {
   async cachedResponseWillBeUsed(param: CachedResponseWillBeUsedCallbackParam) {
     const { cacheName, cachedResponse } = param;
 
-    // do not process any cache other than the one we're watching
-    if (cacheName !== this.cacheNameToWatch) {
+
+    // do not process any cache other than the ones we're watching for
+    if (cacheName !== this.cacheToWatch.name) {
       return cachedResponse;
     }
 
-    const lastSyncTime = await broadcastHelper.getlastSyncTime();
-    const isCacheTooOld = (Date.now() - lastSyncTime) / (1000 * 3600) >= 2; // older than 2 hours -> refresh on open
-    logger.info('Last sync time we have', lastSyncTime);
+    const lastSyncTime = await broadcastHelper.getLastSyncTime(cacheName);
+    const isCacheTooOld = (Date.now() - lastSyncTime) / (1000 * 3600) >= this.cacheToWatch.hoursTTL; // older than TTL hours -> refresh on open
+    logger.info(`Last sync time we have for ${this.cacheToWatch.name}:`, lastSyncTime);
+
     if (isCacheTooOld) {
-      logger.info('Old cache, going to network');
+      logger.info('Old cache, going to network...');
       return null; // means we need to go to network and fetch fresh data
     }
 
@@ -53,11 +60,11 @@ class SyncTimeHandler implements WorkboxPlugin {
     const { cacheName } = param;
 
     // do not process any cache other than the one we're watching
-    if (cacheName !== this.cacheNameToWatch) {
+    if (cacheName !== this.cacheToWatch.name) {
       return;
     }
 
-    broadcastHelper.saveCurrentsyncTime();
+    broadcastHelper.saveSyncTime(cacheName);
   }
 }
 

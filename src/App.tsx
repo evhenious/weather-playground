@@ -1,5 +1,4 @@
 import React, { Suspense, useCallback, useState } from 'react';
-import Forecast from './components/Forecast';
 import { BC_SYNC_CHANNEL } from './globals';
 import { City } from './types';
 import { BroadcastStorageHelper } from './utils/BroadcastStorageHelper';
@@ -8,6 +7,7 @@ import { dataStorage } from './utils/storage/dataStorage';
 
 const CitySearch = React.lazy(() => import('./components/CitySearch'));
 const CityWeather = React.lazy(() => import('./components/CityWeather'));
+const Forecast = React.lazy(() => import('./components/Forecast'));
 
 const cityNameResolver = getCityNameResolver();
 const cityWeatherResolver = getCityWeatherResolver();
