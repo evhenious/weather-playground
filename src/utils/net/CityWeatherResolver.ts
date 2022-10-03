@@ -1,20 +1,16 @@
 import { City, ForecastResponse, Weather, WeatherResponse } from '../../types';
-import { dataStorage } from '../storage/dataStorage';
 import Fetcher, { Defaults } from './Fetcher';
-
-const localStorageCacheKey = 'weather';
 
 const WEATHER_API_ENDPOINTS = {
   getCurrentWeather: process.env.REACT_APP_WEATHER_EP_GET_WEATHER || '',
-  getForecast: process.env.REACT_APP_WEATHER_EP_GET_FORECAST || ''
-}
+  getForecast: process.env.REACT_APP_WEATHER_EP_GET_FORECAST || '',
+};
 
 class CityWeatherResolver extends Fetcher {
   public cachedWeather: Weather | null = null;
 
   constructor(baseUrl: string, defaults: Defaults = {}) {
     super(baseUrl, defaults);
-    this.cachedWeather = dataStorage.getData<Weather>(localStorageCacheKey);
   }
 
   public async fetchCityWeather(city: City): Promise<Weather | null> {
@@ -27,7 +23,6 @@ class CityWeatherResolver extends Fetcher {
 
     try {
       resp = await this.get<WeatherResponse>(WEATHER_API_ENDPOINTS.getCurrentWeather, params);
-      resp && dataStorage.saveData(localStorageCacheKey, resp.data);
     } catch (err) {
       console.error('Cannot fetch city weather', err);
     }

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
+import useLocalCachedState from '../custom_hooks/useLocalCachedState';
 import { City, ForecastDataList } from '../types';
 import { makeTempChartData } from '../utils/forecastUtils';
 import TempChart from './TemperatureChart';
@@ -13,10 +14,10 @@ interface Props {
 }
 
 const Forecast: React.FC<Props> = ({ city, forecastResolver }) => {
-  const [forecast, setForecast] = useState<ForecastDataList>([]);
+  const [forecast, setForecast] = useLocalCachedState<ForecastDataList>('forecast');
 
   //TODO play aroud conditions
-  const tempForecastData = useMemo(() => makeTempChartData(forecast), [forecast]);
+  const tempForecastData = useMemo(() => makeTempChartData(forecast || []), [forecast]);
 
   useEffect(() => {
     forecastResolver
@@ -25,8 +26,8 @@ const Forecast: React.FC<Props> = ({ city, forecastResolver }) => {
         console.log(data);
         return data;
       })
-      .then((data) => setForecast(data?.list || []));
-  }, [city, forecastResolver]);
+      .then((data) => setForecast(data?.list || null));
+  }, [city, forecastResolver, setForecast]);
 
   return (
     <>

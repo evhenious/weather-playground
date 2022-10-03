@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import useLocalCachedState from '../custom_hooks/useLocalCachedState';
 import { City, Weather } from '../types';
 import { DataType } from '../utils/formatUtils';
 import WeatherMain from './WeatherMain';
@@ -8,7 +9,6 @@ import { WeatherTab } from './WeatherTab';
 // The idea of this type - to not be locked on current CityWeatherResolver class,
 // just on key point of fetcher method availability
 type WeatherResolver = {
-  cachedWeather: Weather | null;
   fetchCityWeather: (city: City) => Promise<Weather | null>
 };
 
@@ -24,7 +24,7 @@ const loadingIcon = <img src='logo192_single.png' alt='...loading' className='ab
  */
 const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [weather, setWeather] = useState<Weather | null>(cityWeatherResolver.cachedWeather);
+  const [weather, setWeather] = useLocalCachedState<Weather>('weather');
 
   useEffect(() => {
     setIsFetching(true);
@@ -34,7 +34,7 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
         setIsFetching(false);
         setWeather(data);
       })
-  }, [city, cityWeatherResolver]);
+  }, [city, cityWeatherResolver, setWeather]);
 
   return (
     <div className='px-5 py-10 gap-y-5 flex flex-col text-gray-50'>
