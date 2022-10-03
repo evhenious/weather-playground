@@ -7,8 +7,8 @@ import makeLogger from './logger.js';
 const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP_DEBUG_LOG === '1');
 
 /**
- * A cache first strategy custom variant.
- * Does will return cached response even if responce is expired (when no network).
+ * A cache-first strategy, custom variant.
+ * Will return cached response even if responce is expired (when no network).
  *
  * If the network request fails, and there is no cache match, this will throw a `WorkboxError` exception.
  *
@@ -43,8 +43,8 @@ class CustomCacheFirst {
    * [Workbox Router]{@link module:workbox-routing.Router}.
    *
    * @param {Object} options
-   * @param {Request|string} options.request A request to run this strategy for.
    * @param {Event} [options.event] The event that triggered the request.
+   * @param {Request|string} options.request A request to run this strategy for.
    * @return {Promise<Response>}
    */
   async handle({ event, request }) {
@@ -63,14 +63,7 @@ class CustomCacheFirst {
     };
 
     // Check in the first-step cache, for starters
-    let response = await cacheWrapper.match({
-      cacheName: this._cacheName,
-      request,
-      event,
-      matchOptions: this._matchOptions,
-      plugins: this._plugins,
-    });
-
+    let response = await this.checkDataInCache(this._cacheName, { event, request, plugins: this._plugins });
     logger.log('First cache hit:', !!response);
 
     let error;
@@ -83,21 +76,14 @@ class CustomCacheFirst {
       } catch (err) {
         logger.info('No response from the network, checking in the last-chance cache before returning an error...');
 
-        // What is in last chance cache?
-        response = await cacheWrapper.match({
-          cacheName: this._emergencyCacheName,
-          request,
-          event,
-          matchOptions: this._matchOptions,
-          plugins: [],
-        });
-
-        if (response) {
-          logger.log('Got data from the last-chance cache.');
-        } else {
+        // What is in last-chance cache?
+        response = await this.checkDataInCache(this._emergencyCacheName, { event, request });
+        let cacheHitMsg = 'Got data from the last-chance cache.';
+        if (!response) {
           error = err;
-          logger.log('No data in network and both caches...');
+          cacheHitMsg = 'No data in network and both caches...';
         }
+        logger.log(cacheHitMsg);
       }
     } else {
       logger.log('Cached response found.');
@@ -116,6 +102,20 @@ class CustomCacheFirst {
     }
 
     return response;
+  }
+
+  /**
+   * @param {string} cacheName
+   * @param {Object} [options]
+   * @returns {Promise<Response | undefined>}
+   */
+  checkDataInCache(cacheName, options = {}) {
+    return cacheWrapper.match({
+      cacheName,
+      matchOptions: this._matchOptions,
+      plugins: [],
+      ...options
+    });
   }
 
   /**
