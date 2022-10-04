@@ -46,16 +46,24 @@ export type WeatherResponse = {
   data: Weather;
 };
 
-export type ForecastDataList = {
-  main: any;
-  dt_txt: string;
-}[];
-
 export type ForecastResponse = {
-  data: {
-    list: ForecastDataList;
+  data: ForecastObject;
+};
+
+export type ForecastObject = {
+  list: ForecastDataList;
+  city: {
+    timezone: number;
   };
 };
+
+export type ForecastDataList = {
+  main: {
+    temp: number;
+  };
+  dt: number;
+  dt_txt: string;
+}[];
 
 type TempChartPoint = {
   x: string;

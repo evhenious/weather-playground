@@ -1,4 +1,6 @@
 import { ResponsiveLine } from '@nivo/line';
+import { DateTime } from 'luxon';
+
 import { TempForecastData } from '../types';
 
 const grayText = '#626262';
@@ -45,6 +47,19 @@ const getYScale = (forecast: TempForecastData) => {
   return scale;
 };
 
+const markerNowPoint = () => {
+  const moment = DateTime.now();
+
+  return {
+    axis: 'x',
+    value: moment,
+    lineStyle: { stroke: '#8a4f4d', strokeWidth: 2 },
+    legend: moment.toFormat('T'),
+    legendPosition: 'top-right',
+    textStyle: { fontSize: '0.7em' },
+  };
+};
+
 const TempChart: React.FC<Props> = ({ tempData }) => {
   return (
     <div className='h-52 px-1'>
@@ -72,6 +87,7 @@ const TempChart: React.FC<Props> = ({ tempData }) => {
         }}
         xFormat='time:%Y-%m-%d %H:%M:%S'
         yScale={getYScale(tempData) as any}
+        markers={[markerNowPoint() as any]}
       />
     </div>
   );

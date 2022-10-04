@@ -9,7 +9,7 @@ import { WeatherTab } from './WeatherTab';
 // The idea of this type - to not be locked on current CityWeatherResolver class,
 // just on key point of fetcher method availability
 type WeatherResolver = {
-  fetchCityWeather: (city: City) => Promise<Weather | null>
+  fetchCityWeather: (city: City) => Promise<Weather | null>;
 };
 
 interface Props {
@@ -29,11 +29,10 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
   useEffect(() => {
     setIsFetching(true);
 
-    cityWeatherResolver.fetchCityWeather(city)
-      .then((data) => {
-        setIsFetching(false);
-        setWeather(data);
-      })
+    cityWeatherResolver.fetchCityWeather(city).then((data) => {
+      setIsFetching(false);
+      setWeather(data);
+    });
   }, [city, cityWeatherResolver, setWeather]);
 
   return (
