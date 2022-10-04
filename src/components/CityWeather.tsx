@@ -36,7 +36,7 @@ const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
   }, [city, cityWeatherResolver, setWeather]);
 
   return (
-    <div className='px-5 py-10 gap-y-5 flex flex-col text-gray-50'>
+    <div className='px-5 py-10 gap-y-5 flex flex-col text-gray-50 md:flex-row md:gap-x-3 md:flex-wrap md:justify-around md:px-2'>
       {isFetching && weather ? loadingIcon : false}
       {!weather ? (
         <WeatherTab label='Weather is Not Available...' />

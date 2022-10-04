@@ -22,7 +22,7 @@ const WeatherMain: React.FC<Props> = ({ data }) => {
   const tempColor = temp < 0 ? 'text-blue-200' : 'text-yellow-200';
 
   return (
-    <div className='flex flex-nowrap'>
+    <div className='flex flex-nowrap md:flex-wrap md:min-w-full lg:min-w-[20%]'>
       <div id='data' className='pl-2 mx-auto'>
         <div className='ml-2'>{currentDate}</div>
         <div className='py-2 text-6xl flex justify-center'>
