@@ -1,15 +1,19 @@
 {
   "name": "weather",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.4.5",
+    "@nivo/core": "^0.80.0",
+    "@nivo/line": "^0.80.0",
     "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/postcss7-compat": "npm:@tailwindcss/postcss7-compat@^2.2.17",
     "@types/node": "^12.20.55",
     "@types/react": "^17.0.50",
     "@types/react-dom": "^17.0.17",
     "axios": "^0.27.2",
     "lodash": "^4.17.21",
+    "luxon": "^3.0.4",
     "react": "^17.0",
     "react-dom": "^17.0",
     "react-icons": "^4.4.0",
@@ -48,9 +52,10 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.185",
-    "autoprefixer": "^9.8",
+    "@types/luxon": "^3.0.1",
+    "autoprefixer": "^9.8.8",
     "esbuild": "^0.15.8",
-    "postcss": "^7.0",
+    "postcss": "^7.0.39",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17"
   }
 }

@@ -1,32 +1,51 @@
 export const BC_SYNC_CHANNEL = 'synctube';
 
 export enum BROADCAST_COMMANDS {
-  getLastSync = 'getLastSync',
-  saveLastSync = 'saveLastSync',
-  setLastSync = 'setLastSync',
+  getLastSyncFromStorage = 'getLastSync',
+  saveLastSyncToStorage = 'saveLastSync',
+  lastSyncFromStorage = 'setLastSync',
 }
 
 export type BroadcastData = {
   command: BROADCAST_COMMANDS;
-  payload?: number;
+  payload: string | CacheSyncTimeMsg;
 };
 
-export const makeGetSyncTimeMsg = () => {
+export type CacheSyncTimeMsg = {
+  cacheName: string;
+  timestamp: number;
+};
+
+// message creators
+/**
+ * Used from Web Worker, when it requests last sync time for a given cache name
+ */
+export const requestLastSyncTime = (cacheName: string) => {
   return {
-    command: BROADCAST_COMMANDS.getLastSync,
+    command: BROADCAST_COMMANDS.getLastSyncFromStorage,
+    payload: cacheName,
   };
 };
 
-export const makeSaveSyncTimeMsg = () => {
+/**
+ * Web Worker pushes it after given cache has been updated. Asks to update sync time
+ */
+export const requestSaveSyncTime = ({ cacheName, timestamp }: CacheSyncTimeMsg) => {
   return {
-    command: BROADCAST_COMMANDS.saveLastSync,
-    payload: Date.now(),
+    command: BROADCAST_COMMANDS.saveLastSyncToStorage,
+    payload: {
+      cacheName,
+      timestamp,
+    },
   };
 };
 
-export const makeSetSyncTimeMsg = (syncTimestamp: number) => {
+/**
+ * Storage sends TO Web Worker as a response to **requestLastSyncTime**
+ */
+export const responseLastSyncTime = (payload: CacheSyncTimeMsg) => {
   return {
-    command: BROADCAST_COMMANDS.setLastSync,
-    payload: syncTimestamp,
+    command: BROADCAST_COMMANDS.lastSyncFromStorage,
+    payload,
   };
 };

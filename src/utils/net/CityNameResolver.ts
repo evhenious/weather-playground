@@ -9,10 +9,10 @@ class CityNameResolver extends Fetcher {
   public async fetchCityList(cityNamePart: string): Promise<City[]> {
     let resp: CityResponse | undefined;
 
-    const [url, reqParams] = this.paramBuilder(cityNamePart);
+    const [endpointUrl, reqParams] = this.paramBuilder(cityNamePart);
 
     try {
-      resp = await this.get<CityResponse>(url, reqParams);
+      resp = await this.get<CityResponse>(endpointUrl, reqParams);
     } catch (err) {
       console.error('Cannot fetch cities', err);
     }

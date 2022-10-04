@@ -13,7 +13,8 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
-import { CustomCacheFirst } from './serviceWorker/CustomCacheFirst'
+
+import { CustomCacheFirst } from './serviceWorker/CustomCacheFirst';
 import { SyncTimeHandler } from './serviceWorker/SyncTimeHandler';
 
 declare const self: ServiceWorkerGlobalScope;
@@ -29,17 +30,34 @@ precacheAndRoute(self.__WB_MANIFEST);
 // Cache for weather resolver
 registerRoute(
   // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.host.includes('openweathermap'),
+  ({ url }) => url.host.includes('openweathermap') && url.pathname.includes('/weather'),
   // Customize this strategy as needed
   new CustomCacheFirst({
     cacheName: 'weather-cache',
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the least-recently used entries are removed.
       new ExpirationPlugin({
-        maxAgeSeconds: 60 * 15, // 15 min to keep weather response
+        maxAgeSeconds: 15 * 60, // 15 min to keep
         maxEntries: 5
       }),
-      new SyncTimeHandler('weather-cache')
+      new SyncTimeHandler({ name: 'weather-cache', hoursTTL: 2 })
+    ],
+  })
+);
+
+// Cache for forecast resolver
+registerRoute(
+  ({ url }) => url.host.includes('openweathermap') && url.pathname.includes('/forecast'),
+  // Customize this strategy as needed
+  new CustomCacheFirst({
+    cacheName: 'forecast-cache',
+    plugins: [
+      // Ensure that once this runtime cache reaches a maximum size the least-recently used entries are removed.
+      new ExpirationPlugin({
+        maxAgeSeconds: 4 * 60 * 60, // 6 hrs to keep
+        maxEntries: 2
+      }),
+      new SyncTimeHandler({ name: 'forecast-cache', hoursTTL: 6 })
     ],
   })
 );

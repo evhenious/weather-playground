@@ -1,8 +1,8 @@
-import { GeoParamBuilder } from "../../types";
+import { GeoParamBuilder } from '../../types';
 
 const GEODB_ENDPOINTS = {
-  getCity: process.env.REACT_APP_GEO_EP_GET_CITY || ''
-}
+  getCity: process.env.REACT_APP_GEO_EP_GET_CITY || '',
+};
 
 const baseReqParams = {
   hateoasMode: false,

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import useLocalCachedState from '../custom_hooks/useLocalCachedState';
 import { City, Weather } from '../types';
 import { DataType } from '../utils/formatUtils';
 import WeatherMain from './WeatherMain';
@@ -8,19 +9,13 @@ import { WeatherTab } from './WeatherTab';
 // The idea of this type - to not be locked on current CityWeatherResolver class,
 // just on key point of fetcher method availability
 type WeatherResolver = {
-  cachedWeather: Weather | null;
-  fetchCityWeather: (city: City) => Promise<Weather | null>
+  fetchCityWeather: (city: City) => Promise<Weather | null>;
 };
 
 interface Props {
   city: City;
   cityWeatherResolver: WeatherResolver;
 }
-
-const fetchCityWeather = async (city: City, resolver: WeatherResolver, setWeather: Function) => {
-  const data = await resolver.fetchCityWeather(city);
-  setWeather(data);
-};
 
 const loadingIcon = <img src='logo192_single.png' alt='...loading' className='absolute right-5 w-1/12' />;
 
@@ -29,21 +24,19 @@ const loadingIcon = <img src='logo192_single.png' alt='...loading' className='ab
  */
 const CityWeather: React.FC<Props> = ({ city, cityWeatherResolver }) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [weather, setWeather] = useState<Weather | null>(cityWeatherResolver.cachedWeather);
+  const [weather, setWeather] = useLocalCachedState<Weather>('weather');
 
   useEffect(() => {
     setIsFetching(true);
 
-    const setFetchedWeather = (data: Weather | null) => {
+    cityWeatherResolver.fetchCityWeather(city).then((data) => {
       setIsFetching(false);
       setWeather(data);
-    };
-
-    fetchCityWeather(city, cityWeatherResolver, setFetchedWeather);
-  }, [city, cityWeatherResolver]);
+    });
+  }, [city, cityWeatherResolver, setWeather]);
 
   return (
-    <div className='px-5 py-10 gap-y-5 flex flex-col text-gray-50'>
+    <div className='px-5 py-10 gap-y-5 flex flex-col text-gray-50 md:flex-row md:gap-x-3 md:flex-wrap md:justify-around md:px-2'>
       {isFetching && weather ? loadingIcon : false}
       {!weather ? (
         <WeatherTab label='Weather is Not Available...' />

@@ -5,6 +5,8 @@ export type City = {
   countryCode: string;
   name: string;
   type: string;
+  latitude: number;
+  longitude: number;
 };
 
 export type CityResponse = {
@@ -37,9 +39,38 @@ export type Weather = {
 };
 
 export interface GeoParamBuilder {
-  (cityNamePart: string): [string, { url: string, params: string }];
+  (cityNamePart: string): [string, { url: string; params: string }];
 }
 
 export type WeatherResponse = {
   data: Weather;
 };
+
+export type ForecastResponse = {
+  data: ForecastObject;
+};
+
+export type ForecastObject = {
+  list: ForecastDataList;
+  city: {
+    timezone: number;
+  };
+};
+
+export type ForecastDataList = {
+  main: {
+    temp: number;
+  };
+  dt: number;
+  dt_txt: string;
+}[];
+
+type TempChartPoint = {
+  x: string;
+  y: number;
+};
+
+export type TempForecastData = {
+  id: string;
+  data: TempChartPoint[];
+}[];

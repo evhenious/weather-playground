@@ -10,15 +10,13 @@ interface Props {
 const rowClassName = 'block px-4 py-3 bg-gray-100';
 
 const CityList: React.FC<Props> = ({ data, onSelect, onCancel }) => {
-  const listItems = data
-    .filter((item) => item.type === 'CITY')
-    .map((city, index) => {
-      return (
-        <div id={`${index}`} key={`${city.id}-${city.name}`} className={rowClassName} onClick={() => onSelect(index)}>
-          {city.name}, {city.country}
-        </div>
-      );
-    });
+  const listItems = data.map((city, index) => {
+    return (
+      <div id={`${index}`} key={`${city.id}-${city.name}`} className={rowClassName} onClick={() => onSelect(index)}>
+        {city.name}, {city.country}
+      </div>
+    );
+  });
 
   return (
     <div className='object-contain'>

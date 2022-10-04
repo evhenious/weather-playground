@@ -22,17 +22,17 @@ const WeatherMain: React.FC<Props> = ({ data }) => {
   const tempColor = temp < 0 ? 'text-blue-200' : 'text-yellow-200';
 
   return (
-    <div className='grid grid-cols-2'>
-      <div id='data' className='pl-4'>
-        <div>{currentDate}</div>
-        <div className='py-3 text-6xl flex justify-left'>
+    <div className='flex flex-nowrap md:flex-wrap md:min-w-full lg:min-w-[20%]'>
+      <div id='data' className='pl-2 mx-auto'>
+        <div className='ml-2'>{currentDate}</div>
+        <div className='py-2 text-6xl flex justify-center'>
           <ThermoIcon className={`relative top-1 ${tempColor}`} />
           <span className='flex'>
             {temp}
             <span className='text-4xl align-top'>{symbol}</span>
           </span>
         </div>
-        <div>{`Feels like ${tempFeelsLike}${symbol}`}</div>
+        <div className='ml-2'>{`Feels like ${tempFeelsLike}${symbol}`}</div>
       </div>
       <div id='icon' className='flex flex-col mx-auto'>
         <div className='mx-auto'>{weather[0].description.toUpperCase()}</div>

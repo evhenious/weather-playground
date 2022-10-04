@@ -12,40 +12,36 @@ interface Props {
 const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameResolver }) => {
   const [cityName, setCityName] = useState<string>(currentCity?.name || '');
   const [cityList, setCityList] = useState<City[]>();
-  const [isCityChosen, setCityChosen] = useState(!!currentCity);
 
-  const selectCity = (index: number) => {
+  const selectCityFromList = (index: number) => {
     if (cityList) {
-      setCityChosen(true);
       setCurrentCity(cityList[index]);
       setCityName(cityList[index].name);
     }
-    setCityList([]);
+    setCityList(undefined);
   };
 
   const cancelCityChange = () => {
-    setCityChosen(true);
-    setCityList([]);
+    setCityList(undefined);
     setCityName(currentCity?.name || '');
   };
 
   const inputHandler = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setCityName(target.value);
-    isCityChosen && setCityChosen(false);
   };
 
   const debouncedSearchHandler = useMemo(
     () =>
       debounce(async (cityName) => {
-        if (cityName.length < 3 || isCityChosen) {
+        if (cityName.length < 3 || cityName === currentCity?.name) {
           return;
         }
 
         const data = await cityNameResolver.fetchCityList(cityName);
         // TODO: show notification if no city found
-        setCityList(data);
+        setCityList(data.filter((item) => item.type === 'CITY'));
       }, 400),
-    [isCityChosen, cityNameResolver]
+    [currentCity?.name, cityNameResolver]
   );
 
   // cleanup for debounced callback on unmount
@@ -65,12 +61,12 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameReso
   const grayLabeltext = 'text-sm text-gray-500 bg-gray-50';
 
   return (
-    <div className='shadow sm:overflow-hidden'>
-      <div className='px-4 py-5 bg-gray-200 space-y-6 sm:p-6'>
-        <div className='block'>
-          <div className='mt-1 flex shadow-sm'>
+    <div className='shadow overflow-clip'>
+      <div className='px-3 py-5 bg-gray-200'>
+        <>
+          <div className='flex shadow-sm w-full'>
             <span
-              className={`inline-flex items-center px-3 ${radiusLabel} ${grayBorder} border-r-0 ${grayLabeltext}`}
+              className={`inline-flex items-center px-3 ${radiusLabel} border-r-0 ${grayBorder} ${grayLabeltext}`}
             >
               Location
             </span>
@@ -78,19 +74,19 @@ const CitySearch: React.FC<Props> = ({ currentCity, setCurrentCity, cityNameReso
               type='text'
               name='location'
               id='location'
-              className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 rounded-none text-sm border-gray-300 placeholder-gray-400 focus:placeholder-transparent`}
+              className={`focus:ring-indigo-500 focus:border-indigo-500 flex-grow min-w-[60px] rounded-none text-sm border-gray-300 placeholder-gray-400 focus:placeholder-transparent`}
               placeholder='type something, like London'
               value={cityName}
               onChange={inputHandler}
             />
             <span
-              className={`inline-flex items-center px-3 ${radiusCountryLabel} ${grayBorder} border-l-0 ${grayLabeltext}`}
+              className={`inline-flex items-center px-3 ${radiusCountryLabel} ml-px border-l-0 ${grayBorder} ${grayLabeltext}`}
             >
               {currentCity?.country || 'N/A'}
             </span>
           </div>
-          {cityList?.length ? <CityList data={cityList} onSelect={selectCity} onCancel={cancelCityChange} /> : false}
-        </div>
+          {cityList?.length ? <CityList data={cityList} onSelect={selectCityFromList} onCancel={cancelCityChange} /> : false}
+        </>
       </div>
     </div>
   );
