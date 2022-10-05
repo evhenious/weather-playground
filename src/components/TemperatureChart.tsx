@@ -4,10 +4,11 @@ import { DateTime } from 'luxon';
 import { TempForecastData } from '../types';
 
 const grayText = '#626262';
+const grayerText = '#404040';
 
 const nivoTheme = {
   textColor: 'white',
-  fontSize: 15,
+  fontSize: 14,
   axis: {
     ticks: {
       line: {
@@ -56,7 +57,7 @@ const markerNowPoint = () => {
     lineStyle: { stroke: '#8a4f4d', strokeWidth: 2 },
     legend: moment.toFormat('T'),
     legendPosition: 'top-right',
-    textStyle: { fontSize: '0.7em' },
+    textStyle: { fontSize: '0.7em', fill: grayerText, fontWeight: 'bold' },
   };
 };
 
@@ -67,6 +68,7 @@ const TempChart: React.FC<Props> = ({ tempData }) => {
         {...chartAxisConfig}
         animate={true}
         theme={nivoTheme}
+        layers={['grid', 'axes', 'areas', 'lines', 'points', 'slices', 'mesh', 'legends', 'markers']}
         margin={{ left: 20, right: 20, bottom: 40, top: 15 }}
         data={tempData}
         curve={'monotoneX'}
@@ -75,7 +77,7 @@ const TempChart: React.FC<Props> = ({ tempData }) => {
         areaOpacity={0.4}
         enablePoints={true}
         enablePointLabel={true}
-        pointLabelYOffset={-15}
+        pointLabelYOffset={-10}
         pointLabel={(data) => `${data.y}`}
         enableGridX={false}
         enableGridY={false}

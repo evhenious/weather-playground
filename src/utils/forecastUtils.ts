@@ -14,7 +14,8 @@ const setupChartStartPoint = ([posLine, negLine]: TempForecastData, { list, city
       .toFormat('yyyy-MM-dd TT');
 
     const customChartPoint = { x: prevDatePoint, y: processors[DataType.temp](firstForecastPoint.main.temp) };
-    (firstForecastPoint.main.temp > 0 ? posLine : negLine).data.push(customChartPoint);
+    (firstForecastPoint.main.temp > 0 ? posLine : negLine).data.unshift(customChartPoint);
+    (firstForecastPoint.main.temp > 0 ? posLine : negLine).data.pop(); // keeping one spare forecast step
   }
 };
 
@@ -27,19 +28,15 @@ function makeTempChartData({ list, city }: ForecastObject) {
     { id: 'negative_c', data: [] },
   ];
 
-  setupChartStartPoint(chartLines, { list, city });
-
   list.forEach(({ main, dt_txt }) => {
     const { temp } = main;
     const x = dt_txt;
     const y = processors[DataType.temp](temp);
 
-    if (temp > 0) {
-      chartLines[0].data.push({ x, y });
-    } else {
-      chartLines[1].data.push({ x, y });
-    }
+    (temp > 0 ? chartLines[0] : chartLines[1]).data.push({ x, y });
   });
+
+  setupChartStartPoint(chartLines, { list, city });
 
   return chartLines;
 }
