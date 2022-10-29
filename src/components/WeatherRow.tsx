@@ -9,7 +9,7 @@ interface Props {
 
 const WeatherRow: React.FC<Props> = ({ label, data, type }) => {
   const processedData = type ? formatter.processors[type](data) : data;
-  const additional = type && formatter.additionals[type];
+  const additional = (type && formatter.additionals[type]) || '';
   return (
     <div className='grid grid-cols-2'>
       <span>{label}</span>

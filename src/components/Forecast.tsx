@@ -17,7 +17,7 @@ const Forecast: React.FC<Props> = ({ city, forecastResolver }) => {
   const [forecast, setForecast] = useLocalCachedState<ForecastObject>('forecast');
 
   //TODO play aroud conditions
-  const tempForecastData = useMemo(() => forecast ? makeTempChartData(forecast) : [], [forecast]);
+  const tempForecastData = useMemo(() => forecast ? makeTempChartData(forecast) : null, [forecast]);
 
   useEffect(() => {
     forecastResolver
@@ -27,7 +27,7 @@ const Forecast: React.FC<Props> = ({ city, forecastResolver }) => {
 
   return (
     <>
-      {forecast ? <TempChart tempData={tempForecastData} /> : false}
+      {!!tempForecastData ? <TempChart tempData={tempForecastData} /> : false}
     </>
   );
 };
