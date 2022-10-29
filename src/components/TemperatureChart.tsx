@@ -53,7 +53,7 @@ const markerNowPoint = () => {
 
   return {
     axis: 'x',
-    value: moment,
+    value: moment.toMillis(),
     lineStyle: { stroke: '#8a4f4d', strokeWidth: 2 },
     legend: moment.toFormat('T'),
     legendPosition: 'top-right',
