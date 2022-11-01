@@ -2,6 +2,7 @@ import { cacheNames } from 'workbox-core/_private/cacheNames.js';
 import { cacheWrapper } from 'workbox-core/_private/cacheWrapper.js';
 import { fetchWrapper } from 'workbox-core/_private/fetchWrapper.js';
 import { WorkboxError } from 'workbox-core/_private/WorkboxError.js';
+import { Strategy } from 'workbox-strategies'
 import makeLogger from './logger.js';
 
 const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP_DEBUG_LOG === '1');
@@ -14,7 +15,7 @@ const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP
  *
  * @memberof module:workbox-strategies
  */
-class CustomCacheFirst {
+class CustomCacheFirst extends Strategy {
   /**
    * @param {Object} options
    * @param {string} options.cacheName Cache name to store and retrieve requests. Defaults to cache names provided by
@@ -30,12 +31,63 @@ class CustomCacheFirst {
    * @param {Object} options.matchOptions [`CacheQueryOptions`](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions)
    */
   constructor(options = {}) {
+    super(options);
+
     this._cacheName = cacheNames.getRuntimeName(options.cacheName);
     this._plugins = options.plugins || [];
     this._fetchOptions = options.fetchOptions;
     this._matchOptions = options.matchOptions;
 
     this._emergencyCacheName = `last-chance-${options.cacheName}`; // suppose to not be customized
+  }
+
+  /**
+   * Main handler used by workbox v6
+   * @param {Request|string} request A request to run this strategy for.
+   * @param {workbox-strategies.StrategyHandler} handler
+   */
+  async _handle(request, handler) {
+    // Check in the first-step cache, for starters
+    let response = await handler.cacheMatch(request);
+    logger.log('First cache hit:', !!response);
+
+    let error;
+    if (!response) {
+      logger.log(`No response in a cache [${this.cacheName}], going to network...`);
+
+      try {
+        response = await handler.fetchAndCachePut(request);
+        logger.log('Got fresh data from the network!');
+      } catch (err) {
+        logger.info('No response from the network, checking in the last-chance cache before returning an error...');
+
+        this.cacheName = this._emergencyCacheName;
+        response = await handler.cacheMatch(request);
+
+        let cacheHitMsg = `Got data from the last-chance cache [${this.cacheName}]`;
+        if (!response) {
+          error = err;
+          cacheHitMsg = 'No data in network and both caches...';
+        }
+        logger.log(cacheHitMsg);
+      }
+    } else {
+      logger.log('Cached response found.');
+      this.cacheName = this._emergencyCacheName;
+      this.plugins = [];
+    }
+
+    if (response) {
+      // save response to last-chance cache
+      const responseClone = response.clone();
+      void handler.waitUntil(handler.cachePut(request, responseClone));
+    } else {
+      throw new WorkboxError('no-response', { url: request.url, error });
+    }
+
+    this.cacheName = this._cacheName;
+    this.plugins = this._plugins;
+    return response;
   }
 
   /**
@@ -110,11 +162,11 @@ class CustomCacheFirst {
    * @returns {Promise<Response | undefined>}
    */
   checkDataInCache(cacheName, options = {}) {
-    return cacheWrapper.match({
+    return cacheWrapper?.match({
       cacheName,
       matchOptions: this._matchOptions,
       plugins: [],
-      ...options
+      ...options,
     });
   }
 
