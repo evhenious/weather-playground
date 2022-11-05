@@ -87,7 +87,7 @@ class CustomCacheFirst extends Strategy {
 
     logger.log(`Done with [${this.cacheName}]`);
     // handler._plugins = [...this.plugins];
-    this.cacheName = this._cacheName;
+    // this.cacheName = this._cacheName;
     return response;
   }
 
