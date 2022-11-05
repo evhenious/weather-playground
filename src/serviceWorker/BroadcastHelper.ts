@@ -23,7 +23,7 @@ class BroadcastHelper {
       const catchLastSyncDate = ({ data }: { data: BroadcastData }) => {
         if (data.command === BROADCAST_COMMANDS.lastSyncFromStorage) {
           this.bc.removeEventListener(eventName, catchLastSyncDate);
-          resolve((data as any as CacheSyncTimeMsg).timestamp);
+          resolve((data.payload as CacheSyncTimeMsg).timestamp);
         }
       };
 
