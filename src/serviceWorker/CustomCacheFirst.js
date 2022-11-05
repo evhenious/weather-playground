@@ -75,17 +75,18 @@ class CustomCacheFirst extends Strategy {
     }
 
     if (response) {
-      handler._plugins = [];
+      // handler._plugins = [];
       this.cacheName = this._emergencyCacheName;
       logger.log(`Updating [${this.cacheName}]`);
 
       // save response to last-chance cache
-      await handler.cachePut(request, response.clone());
+      void handler.waitUntil(handler.cachePut(request, response.clone()));
     } else {
       throw new WorkboxError('no-response', { url: request.url, error });
     }
 
     logger.log(`Done with [${this.cacheName}]`);
+    // handler._plugins = [...this.plugins];
     this.cacheName = this._cacheName;
     return response;
   }
