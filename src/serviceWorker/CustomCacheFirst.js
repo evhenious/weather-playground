@@ -34,7 +34,6 @@ class CustomCacheFirst extends Strategy {
     super(options);
 
     this._cacheName = cacheNames.getRuntimeName(options.cacheName);
-    this._plugins = options.plugins || [];
     this._fetchOptions = options.fetchOptions;
     this._matchOptions = options.matchOptions;
 
@@ -57,11 +56,11 @@ class CustomCacheFirst extends Strategy {
 
       try {
         response = await handler.fetchAndCachePut(request);
-        logger.log('Got fresh data from the network!');
+        logger.log(`Got fresh data for [${this.cacheName}] from the network!`);
       } catch (err) {
-        logger.info('No response from the network, checking in the last-chance cache before returning an error...');
-
         this.cacheName = this._emergencyCacheName;
+        logger.info(`No response from the network, checking in last-chance cache [${this.cacheName}] cache...`);
+
         response = await handler.cacheMatch(request);
 
         let cacheHitMsg = `Got data from the last-chance cache [${this.cacheName}]`;
@@ -73,20 +72,21 @@ class CustomCacheFirst extends Strategy {
       }
     } else {
       logger.log('Cached response found.');
-      this.cacheName = this._emergencyCacheName;
-      this.plugins = [];
     }
 
     if (response) {
+      handler._plugins = [];
+      this.cacheName = this._emergencyCacheName;
+      logger.log(`Updating [${this.cacheName}]`);
+
       // save response to last-chance cache
-      const responseClone = response.clone();
-      void handler.waitUntil(handler.cachePut(request, responseClone));
+      await handler.cachePut(request, response.clone());
     } else {
       throw new WorkboxError('no-response', { url: request.url, error });
     }
 
+    logger.log(`Done with [${this.cacheName}]`);
     this.cacheName = this._cacheName;
-    this.plugins = this._plugins;
     return response;
   }
 
