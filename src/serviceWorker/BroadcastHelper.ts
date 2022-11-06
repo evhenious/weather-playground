@@ -27,7 +27,7 @@ class BroadcastHelper {
         }
       };
 
-      logger.info('Gettig last sync time if available...');
+      logger.log('Gettig last sync time if available...');
       this.bc.addEventListener(eventName, catchLastSyncDate);
 
       this.bc.postMessage(requestLastSyncTime(cacheName));

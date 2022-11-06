@@ -38,8 +38,8 @@ class SyncTimeHandler implements WorkboxPlugin {
     }
 
     const lastSyncTime = await broadcastHelper.getLastSyncTime(cacheName);
-    const isCacheTooOld = (Date.now() - lastSyncTime) / (1000 * 3600) >= this.cacheToWatch.hoursTTL; // older than TTL hours -> refresh on open
     logger.info(`Last sync time we have for [${this.cacheToWatch.name}]:`, lastSyncTime);
+    const isCacheTooOld = (Date.now() - lastSyncTime) / (1000 * 3600) >= this.cacheToWatch.hoursTTL; // older than TTL hours -> refresh on open
 
     if (isCacheTooOld) {
       logger.info('Old cache, going to network...');
