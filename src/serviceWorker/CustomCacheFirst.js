@@ -32,9 +32,6 @@ class CustomCacheFirst extends Strategy {
     super(options);
 
     this._cacheName = cacheNames.getRuntimeName(options.cacheName);
-    this._fetchOptions = options.fetchOptions;
-    this._matchOptions = options.matchOptions;
-
     this._emergencyCacheName = `last-chance-${options.cacheName}`; // suppose to not be customized
   }
 
