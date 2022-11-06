@@ -5,7 +5,7 @@ import { WorkboxError } from 'workbox-core/_private/WorkboxError.js';
 import { Strategy } from 'workbox-strategies'
 import makeLogger from './logger.js';
 
-const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP_DEBUG_LOG === '1');
+const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]' /*, process.env.REACT_APP_DEBUG_LOG === '1' */);
 
 /**
  * A cache-first strategy, custom variant.
@@ -51,11 +51,15 @@ class CustomCacheFirst extends Strategy {
     logger.log('First cache hit:', !!response);
 
     let error;
-    if (!response) {
+    let isFromEmergency = false;
+    if (response) {
+      logger.log('Cached response found, need to update last-chance-cache.');
+      this.cacheName = this._emergencyCacheName;
+    } else {
       logger.log(`No response in a cache [${this.cacheName}], going to network...`);
 
       try {
-        response = await handler.fetchAndCachePut(request);
+        response = await handler.fetch(request);
         logger.log(`Got fresh data for [${this.cacheName}] from the network!`);
       } catch (err) {
         this.cacheName = this._emergencyCacheName;
@@ -64,30 +68,35 @@ class CustomCacheFirst extends Strategy {
         response = await handler.cacheMatch(request);
 
         let cacheHitMsg = `Got data from the last-chance cache [${this.cacheName}]`;
+        isFromEmergency = true;
         if (!response) {
           error = err;
           cacheHitMsg = 'No data in network and both caches...';
         }
         logger.log(cacheHitMsg);
       }
-    } else {
-      logger.log('Cached response found.');
     }
 
-    if (response) {
-      // handler._plugins = [];
-      this.cacheName = this._emergencyCacheName;
-      logger.log(`Updating [${this.cacheName}]`);
+    if (response && !isFromEmergency) {
+      handler.waitUntil(
+        Promise.resolve().then(async () => {
+          if (this.cacheName === this._emergencyCacheName) {
+            handler._plugins = [];
+          }
 
-      // save response to last-chance cache
-      void handler.waitUntil(handler.cachePut(request, response.clone()));
+          logger.log(`Updating cache [${this.cacheName}]`);
+          await handler.cachePut(request, response.clone());
+
+          if (this.cacheName === this._emergencyCacheName) {
+            handler._plugins = [...this.plugins];
+            this.cacheName = this._cacheName;
+          }
+        })
+      );
     } else {
       throw new WorkboxError('no-response', { url: request.url, error });
     }
 
-    logger.log(`Done with [${this.cacheName}]`);
-    // handler._plugins = [...this.plugins];
-    // this.cacheName = this._cacheName;
     return response;
   }
 
