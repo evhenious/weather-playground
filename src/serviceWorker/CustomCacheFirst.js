@@ -1,11 +1,9 @@
 import { cacheNames } from 'workbox-core/_private/cacheNames.js';
-// import { cacheWrapper } from 'workbox-core/_private/cacheWrapper.js';
-// import { fetchWrapper } from 'workbox-core/_private/fetchWrapper.js';
 import { WorkboxError } from 'workbox-core/_private/WorkboxError.js';
 import { Strategy } from 'workbox-strategies'
 import makeLogger from './logger.js';
 
-const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]' /*, process.env.REACT_APP_DEBUG_LOG === '1' */);
+const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP_DEBUG_LOG === '1');
 
 /**
  * A cache-first strategy, custom variant.
