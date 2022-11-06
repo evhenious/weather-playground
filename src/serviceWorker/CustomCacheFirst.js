@@ -1,6 +1,6 @@
 import { cacheNames } from 'workbox-core/_private/cacheNames.js';
 import { WorkboxError } from 'workbox-core/_private/WorkboxError.js';
-import { Strategy } from 'workbox-strategies'
+import { Strategy } from 'workbox-strategies';
 import makeLogger from './logger.js';
 
 const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP_DEBUG_LOG === '1');
@@ -72,7 +72,11 @@ class CustomCacheFirst extends Strategy {
       }
     }
 
-    if (response && !isFromEmergency) {
+    if (!response) {
+      throw new WorkboxError('no-response', { url: request.url, error });
+    }
+
+    if (!isFromEmergency) {
       handler.waitUntil(
         Promise.resolve().then(async () => {
           if (this.cacheName === this._emergencyCacheName) {
@@ -88,8 +92,6 @@ class CustomCacheFirst extends Strategy {
           }
         })
       );
-    } else {
-      throw new WorkboxError('no-response', { url: request.url, error });
     }
 
     return response;
