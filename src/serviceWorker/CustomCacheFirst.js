@@ -14,11 +14,8 @@ const logger = makeLogger('[SERVICE_WORKER|CUSTOM_CACHE]', process.env.REACT_APP
  * @memberof module:workbox-strategies
  */
 class CustomCacheFirst extends Strategy {
-  private _cacheName: string;
-  private _emergencyCacheName: string;
-
   /**
-   * @param {Object} options
+   * @param {StrategyOptions} options
    * @param {string} options.cacheName Cache name to store and retrieve requests. Defaults to cache names provided by
    * [workbox-core]{@link module:workbox-core.cacheNames}.
    *
@@ -32,7 +29,7 @@ class CustomCacheFirst extends Strategy {
    * @param {Object} options.matchOptions [`CacheQueryOptions`](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions)
    * for any `cache.match()` or `cache.put()` calls made by this strategy.
    */
-  constructor(options: StrategyOptions = {}) {
+  constructor(options = {}) {
     super(options);
 
     this._cacheName = cacheNames.getRuntimeName(options.cacheName);
@@ -42,9 +39,9 @@ class CustomCacheFirst extends Strategy {
   /**
    * Main strategy handler used by workbox v6
    * @param {Request|string} request A request to run this strategy for.
-   * @param {workbox-strategies.StrategyHandler} handler
+   * @param {StrategyHandler} handler
    */
-  async _handle(request: Request, handler: StrategyHandler) {
+  async _handle(request, handler) {
     // Check in the first-step cache, for starters
     let response = await handler.cacheMatch(request);
     logger.log('First cache hit:', !!response);
@@ -84,14 +81,14 @@ class CustomCacheFirst extends Strategy {
       handler.waitUntil(
         Promise.resolve().then(async () => {
           if (this.cacheName === this._emergencyCacheName) {
-            (handler as any)._plugins = []; // 'any' is intentional
+            handler._plugins = [];
           }
 
           logger.log(`Updating cache [${this.cacheName}]`);
-          await handler.cachePut(request, (response as any).clone()); // 'any' is intentional
+          await handler.cachePut(request, response.clone());
 
           if (this.cacheName === this._emergencyCacheName) {
-            (handler as any)._plugins = [...this.plugins];  // 'any' is intentional
+            handler._plugins = [...this.plugins];
             this.cacheName = this._cacheName;
           }
         })
