@@ -21,13 +21,13 @@ class BroadcastHelper {
     return new Promise<number>((resolve) => {
       // temp event handler for one-time response catch
       const catchLastSyncDate = ({ data }: { data: BroadcastData }) => {
-        if (data.command === BROADCAST_COMMANDS.lastSyncFromStorage) {
+        if (data.command === BROADCAST_COMMANDS.lastSyncFromStorage && (data.payload as CacheSyncTimeMsg).cacheName === cacheName) {
           this.bc.removeEventListener(eventName, catchLastSyncDate);
-          resolve((data as any as CacheSyncTimeMsg).timestamp);
+          resolve((data.payload as CacheSyncTimeMsg).timestamp);
         }
       };
 
-      logger.info('Gettig last sync time if available...');
+      logger.log('Gettig last sync time if available...');
       this.bc.addEventListener(eventName, catchLastSyncDate);
 
       this.bc.postMessage(requestLastSyncTime(cacheName));

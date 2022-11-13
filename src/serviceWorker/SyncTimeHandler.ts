@@ -31,18 +31,18 @@ class SyncTimeHandler implements WorkboxPlugin {
   async cachedResponseWillBeUsed(param: CachedResponseWillBeUsedCallbackParam) {
     const { cacheName, cachedResponse } = param;
 
-
     // do not process any cache other than the ones we're watching for
     if (cacheName !== this.cacheToWatch.name) {
       return cachedResponse;
     }
 
     const lastSyncTime = await broadcastHelper.getLastSyncTime(cacheName);
-    const isCacheTooOld = (Date.now() - lastSyncTime) / (1000 * 3600) >= this.cacheToWatch.hoursTTL; // older than TTL hours -> refresh on open
-    logger.info(`Last sync time we have for [${this.cacheToWatch.name}]:`, lastSyncTime);
+    logger.info(`Last sync time we have for [${cacheName}]:`, lastSyncTime);
+    const isRefreshNeeded = lastSyncTime === 0 // no last data
+      || (Date.now() - lastSyncTime) / (1000 * 3600) >= this.cacheToWatch.hoursTTL; // older than TTL hours -> refresh on open
 
-    if (isCacheTooOld) {
-      logger.info('Old cache, going to network...');
+    if (isRefreshNeeded) {
+      logger.log(`[${cacheName}] cache seems to be ${lastSyncTime ? 'expired' : 'absent'}...`);
       return null; // means we need to go to network and fetch fresh data
     }
 
@@ -50,7 +50,7 @@ class SyncTimeHandler implements WorkboxPlugin {
   }
 
   /**
-   * If our cache was successfully updated, we save the timestamp to be able to check if cache is old later
+   * If our cache was successfully updated, we save the timestamp to be able to check if cache is expired in later calls
    *
    * @param param
    *
@@ -64,6 +64,7 @@ class SyncTimeHandler implements WorkboxPlugin {
       return;
     }
 
+    logger.log(`Updating last sync time for [${cacheName}]...`);
     broadcastHelper.saveSyncTime(cacheName);
   }
 }
