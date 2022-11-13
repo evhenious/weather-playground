@@ -38,37 +38,43 @@ class CustomCacheFirst extends Strategy {
 
   /**
    * Main strategy handler used by workbox v6
+   *
+   * cache -> miss -> network -> OK -> cache put -> responce
+   * cache -> hit -> last-chance cache put -> responce
+   * cache -> miss -> network -> NO -> last-chance cache -> hit -> responce
+   * cache -> miss -> network -> NO -> last-chance cache -> miss -> error
+   *
    * @param {Request|string} request A request to run this strategy for.
    * @param {StrategyHandler} handler
    */
   async _handle(request, handler) {
-    // Check in the first-step cache, for starters
-    let response = await handler.cacheMatch(request);
-    logger.log('First cache hit:', !!response);
-
+    // Check in the first-step cache
     let error;
-    let isFromEmergency = false;
+    let response = await handler.cacheMatch(request);
+    let isLastChanceCacheHit = false;
+
     if (response) {
-      logger.log('Cached response found, need to update last-chance-cache.');
+      logger.log(`First cache hit for [${this.cacheName}], need to update [${this._emergencyCacheName}].`);
       this.cacheName = this._emergencyCacheName;
     } else {
-      logger.log(`No response in a cache [${this.cacheName}], going to network...`);
+      logger.log(`No response in [${this.cacheName}], going to network...`);
 
       try {
         response = await handler.fetch(request);
         logger.log(`Got fresh data for [${this.cacheName}] from the network!`);
       } catch (err) {
         this.cacheName = this._emergencyCacheName;
-        logger.info(`No response from the network, checking in last-chance cache [${this.cacheName}] cache...`);
+        logger.info(`No response from the network, checking in [${this.cacheName}] cache...`);
 
         response = await handler.cacheMatch(request);
 
-        let cacheHitMsg = `Got data from the last-chance cache [${this.cacheName}]`;
-        isFromEmergency = true;
+        let cacheHitMsg = `Got data from [${this._emergencyCacheName}]`;
+        isLastChanceCacheHit = true;
         if (!response) {
           error = err;
-          cacheHitMsg = 'No data in network and both caches...';
+          cacheHitMsg = 'No data in network and both caches. Throwing error';
         }
+
         logger.log(cacheHitMsg);
       }
     }
@@ -77,9 +83,12 @@ class CustomCacheFirst extends Strategy {
       throw new WorkboxError('no-response', { url: request.url, error });
     }
 
-    if (!isFromEmergency) {
+    // we are here - means a _response_ is not empty
+    if (!isLastChanceCacheHit) {
       handler.waitUntil(
         Promise.resolve().then(async () => {
+
+          // last-chance cache will be updated on first hit of successful main cache hit
           if (this.cacheName === this._emergencyCacheName) {
             handler._plugins = [];
           }
