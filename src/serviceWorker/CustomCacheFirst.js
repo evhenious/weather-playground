@@ -51,7 +51,6 @@ class CustomCacheFirst extends Strategy {
     // Check in the first-step cache
     let error;
     let response = await handler.cacheMatch(request);
-    let isLastChanceCacheHit = false;
     const finalActions = [];
 
     if (response) {
@@ -72,7 +71,6 @@ class CustomCacheFirst extends Strategy {
         response = await handler.cacheMatch(request);
 
         let cacheHitMsg = `Got data from [${this.cacheName}]`;
-        isLastChanceCacheHit = true;
         if (!response) {
           error = err;
           cacheHitMsg = `[${this.cacheName}] - no data in network and both caches. Throwing error`;
@@ -88,8 +86,8 @@ class CustomCacheFirst extends Strategy {
     }
 
     // we are here - means a _response_ is not empty, and data is from first cache or network
-    if (!isLastChanceCacheHit) {
-      logger.log(`Final action steps: ${finalActions.length}`);
+    if (finalActions.length) {
+      logger.log(`Final action steps [${this.cacheName}]: ${finalActions.length}`);
       const clonedResp = response.clone();
       handler.waitUntil(
         Promise.resolve().then(async () => {
