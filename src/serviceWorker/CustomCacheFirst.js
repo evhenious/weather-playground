@@ -39,7 +39,7 @@ class CustomCacheFirst extends Strategy {
   /**
    * Main strategy handler used by workbox v6
    *
-   * cache -> miss -> network -> OK -> cache put -> responce
+   * cache -> miss -> network -> OK -> cache put, last-chance cache put -> responce
    * cache -> hit -> last-chance cache put -> responce
    * cache -> miss -> network -> NO -> last-chance cache -> hit -> responce
    * cache -> miss -> network -> NO -> last-chance cache -> miss -> error
@@ -52,59 +52,70 @@ class CustomCacheFirst extends Strategy {
     let error;
     let response = await handler.cacheMatch(request);
     let isLastChanceCacheHit = false;
+    const finalActions = [];
 
     if (response) {
       logger.log(`First cache hit for [${this.cacheName}], need to update [${this._emergencyCacheName}].`);
-      this.cacheName = this._emergencyCacheName;
+      finalActions.push(this.#updateLastChanceCache.bind(this));
     } else {
       logger.log(`No response in [${this.cacheName}], going to network...`);
 
       try {
         response = await handler.fetch(request);
         logger.log(`Got fresh data for [${this.cacheName}] from the network!`);
+        finalActions.push(this.#updateCache.bind(this), this.#updateLastChanceCache.bind(this));
+
       } catch (err) {
         this.cacheName = this._emergencyCacheName;
         logger.info(`No response from the network, checking in [${this.cacheName}] cache...`);
 
         response = await handler.cacheMatch(request);
 
-        let cacheHitMsg = `Got data from [${this._emergencyCacheName}]`;
+        let cacheHitMsg = `Got data from [${this.cacheName}]`;
         isLastChanceCacheHit = true;
         if (!response) {
           error = err;
-          cacheHitMsg = 'No data in network and both caches. Throwing error';
+          cacheHitMsg = `[${this.cacheName}] - no data in network and both caches. Throwing error`;
         }
 
         logger.log(cacheHitMsg);
       }
     }
+    this.cacheName = this._cacheName; // just to be sure
 
     if (!response) {
       throw new WorkboxError('no-response', { url: request.url, error });
     }
 
-    // we are here - means a _response_ is not empty
+    // we are here - means a _response_ is not empty, and data is from first cache or network
     if (!isLastChanceCacheHit) {
+      logger.log(`Final action steps: ${finalActions.length}`);
+      const clonedResp = response.clone();
       handler.waitUntil(
         Promise.resolve().then(async () => {
-
-          // last-chance cache will be updated on first hit of successful main cache hit
-          if (this.cacheName === this._emergencyCacheName) {
-            handler._plugins = [];
-          }
-
-          logger.log(`Updating cache [${this.cacheName}]`);
-          await handler.cachePut(request, response.clone());
-
-          if (this.cacheName === this._emergencyCacheName) {
-            handler._plugins = [...this.plugins];
-            this.cacheName = this._cacheName;
+          for (const step of finalActions) {
+            await step(handler, request, clonedResp);
           }
         })
       );
     }
 
     return response;
+  }
+
+  async #updateCache(handler, request, response) {
+    this.cacheName = this._cacheName; // just to be sure
+    logger.log(`Updating cache [${this.cacheName}]`);
+    await handler.cachePut(request, response);
+  }
+
+  async #updateLastChanceCache(handler, request, response) {
+    this.cacheName = this._emergencyCacheName;
+    logger.log(`Updating cache [${this.cacheName}]`);
+    handler._plugins = [];
+    await handler.cachePut(request, response);
+    handler._plugins = [...this.plugins];
+    this.cacheName = this._cacheName;
   }
 }
 
