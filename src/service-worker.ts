@@ -3,10 +3,8 @@
 
 // This service worker can be customized!
 // See https://developers.google.com/web/tools/workbox/modules
-// for the list of available Workbox modules, or add any other
-// code you'd like.
-// You can also remove this file if you'd prefer not to use a
-// service worker, and the Workbox build step will be skipped.
+// for the list of available Workbox modules, or add any other code you'd like.
+// You can also remove this file if you'd prefer not to use a service worker - and the Workbox build step will be skipped.
 
 import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
@@ -54,7 +52,7 @@ registerRoute(
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the least-recently used entries are removed.
       new ExpirationPlugin({
-        maxAgeSeconds: 4 * 60 * 60, // 6 hrs to keep
+        maxAgeSeconds: 4 * 60 * 60, // 4 hrs to keep
         maxEntries: 2
       }),
       new SyncTimeHandler({ name: 'forecast-cache', hoursTTL: 6 })
