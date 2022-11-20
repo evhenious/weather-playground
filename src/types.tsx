@@ -72,5 +72,6 @@ type TempChartPoint = {
 
 export type TempForecastData = {
   id: string;
+  type: 'pos' | 'neg',
   data: TempChartPoint[];
 }[];

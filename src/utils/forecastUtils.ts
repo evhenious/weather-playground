@@ -26,19 +26,35 @@ const setupChartStartPoint = ([posLine, negLine]: TempForecastData, { list, city
  */
 function makeTempChartData({ list, city }: ForecastObject) {
   const chartLines: TempForecastData = [
-    { id: 'positive_c', data: [] },
-    { id: 'negative_c', data: [] },
+    { id: 'temp-0', data: [], type: 'pos' },
   ];
 
-  list.forEach(({ main, dt_txt }) => {
+  let activeChartIndex = 0;
+  list.forEach(({ main, dt_txt }, index, arr) => {
     const { temp } = main;
     const x = dt_txt;
     const y = processors[DataType.temp](temp);
 
-    (y > 0 ? chartLines[0] : chartLines[1]).data.push({ x, y });
+    let activeChart = chartLines[activeChartIndex];
+    activeChart.data.push({ x, y });
+
+    if (index === 0) {
+      activeChart.type = y > 0 ? 'pos' : 'neg';
+      return;
+    }
+
+    const prevY = processors[DataType.temp](arr[index - 1].main.temp);
+    const isChartSwitch = (prevY > 0 && y < 0) || (prevY < 0 && y > 0);
+
+    if (isChartSwitch) {
+      activeChartIndex += 1;
+      chartLines.push({ id: `temp-${activeChartIndex}`, data: [], type: y > 0 ? 'pos' : 'neg' });
+      chartLines[activeChartIndex].data.push({ x, y });
+    }
   });
 
-  setupChartStartPoint(chartLines, { list, city });
+  // setupChartStartPoint(chartLines, { list, city });
+  console.log(chartLines)
 
   return chartLines;
 }
