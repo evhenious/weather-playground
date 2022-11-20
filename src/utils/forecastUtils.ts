@@ -7,15 +7,17 @@ import { DataType, processors } from './formatUtils';
  */
 const setupChartStartPoint = ([posLine, negLine]: TempForecastData, { list, city }: ForecastObject) => {
   const firstForecastPoint = list[0];
+  const lastForecastPoint = list[list.length - 1];
+  const processedLastValue = processors[DataType.temp](lastForecastPoint.main.temp)
 
   if (firstForecastPoint.dt + city.timezone / 60 > Math.round(Date.now() / 1000)) {
     const prevDatePoint = DateTime.fromSeconds(firstForecastPoint.dt, { zone: 'UTC' })
-      .minus({ hours: 3 })
+      .minus({ hours: 3 }) //! not a timeshift, just minus 3hrs
       .toFormat('yyyy-MM-dd TT');
 
     const customChartPoint = { x: prevDatePoint, y: processors[DataType.temp](firstForecastPoint.main.temp) };
-    (firstForecastPoint.main.temp > 0 ? posLine : negLine).data.unshift(customChartPoint);
-    (firstForecastPoint.main.temp > 0 ? posLine : negLine).data.pop(); // keeping one spare forecast step
+    (customChartPoint.y > 0 ? posLine : negLine).data.unshift(customChartPoint);
+    (processedLastValue > 0 ? posLine : negLine).data.pop(); // keeping one spare forecast step
   }
 };
 
@@ -33,7 +35,7 @@ function makeTempChartData({ list, city }: ForecastObject) {
     const x = dt_txt;
     const y = processors[DataType.temp](temp);
 
-    (temp > 0 ? chartLines[0] : chartLines[1]).data.push({ x, y });
+    (y > 0 ? chartLines[0] : chartLines[1]).data.push({ x, y });
   });
 
   setupChartStartPoint(chartLines, { list, city });

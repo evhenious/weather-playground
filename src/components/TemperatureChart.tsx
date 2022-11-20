@@ -61,6 +61,14 @@ const markerNowPoint = () => {
   };
 };
 
+const markerZero = () => {
+  return {
+    axis: 'y',
+    value: 0,
+    lineStyle: { stroke: '#8a4f4d', strokeWidth: 2 },
+  };
+};
+
 const TempChart: React.FC<Props> = ({ tempData }) => {
   return (
     <div className='h-52 px-1'>
