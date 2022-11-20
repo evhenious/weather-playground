@@ -21,7 +21,9 @@
     "build:api": "esbuild ./api_src/geo.js --outfile=./api/geo.js --minify --platform=node --target=node16",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build-storybook": "build-storybook -s public"
   },
   "eslintConfig": {
     "extends": [
@@ -30,6 +32,16 @@
     ],
     "ignorePatterns": [
       "api"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
     ]
   },
   "browserslist": {
@@ -45,6 +57,17 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^6.5.13",
+    "@storybook/addon-essentials": "^6.5.13",
+    "@storybook/addon-interactions": "^6.5.13",
+    "@storybook/addon-links": "^6.5.13",
+    "@storybook/addon-postcss": "^2.0.0",
+    "@storybook/builder-webpack5": "^6.5.13",
+    "@storybook/manager-webpack5": "^6.5.13",
+    "@storybook/node-logger": "^6.5.13",
+    "@storybook/preset-create-react-app": "^4.1.2",
+    "@storybook/react": "^6.5.13",
+    "@storybook/testing-library": "0.0.13",
     "@tailwindcss/forms": "^0.5.3",
     "@types/lodash": "^4.14.185",
     "@types/luxon": "^3.0.1",
@@ -52,8 +75,11 @@
     "@types/react": "^17.0.52",
     "@types/react-dom": "^17.0.18",
     "autoprefixer": "^10.4.13",
+    "babel-plugin-named-exports-order": "0.0.2",
     "esbuild": "^0.15.12",
     "postcss": "^8.4.18",
-    "tailwindcss": "^3.2.1"
+    "prop-types": "^15.8.1",
+    "tailwindcss": "^3.2.1",
+    "webpack": "^5.75.0"
   }
 }
