@@ -5,10 +5,8 @@ import { DataType, processors } from './formatUtils';
 /**
  * Inserts custom date point as a first chart point if there is not cached data and forecast starts ahead of NOW
  */
-const setupChartStartPoint = ([posLine, negLine]: TempForecastData, { list, city }: ForecastObject) => {
+const setupChartStartPoint = (chartLines: TempForecastData, { list, city }: ForecastObject) => {
   const firstForecastPoint = list[0];
-  const lastForecastPoint = list[list.length - 1];
-  const processedLastValue = processors[DataType.temp](lastForecastPoint.main.temp)
 
   if (firstForecastPoint.dt + city.timezone / 60 > Math.round(Date.now() / 1000)) {
     const prevDatePoint = DateTime.fromSeconds(firstForecastPoint.dt, { zone: 'UTC' })
@@ -16,8 +14,8 @@ const setupChartStartPoint = ([posLine, negLine]: TempForecastData, { list, city
       .toFormat('yyyy-MM-dd TT');
 
     const customChartPoint = { x: prevDatePoint, y: processors[DataType.temp](firstForecastPoint.main.temp) };
-    (customChartPoint.y > 0 ? posLine : negLine).data.unshift(customChartPoint);
-    (processedLastValue > 0 ? posLine : negLine).data.pop(); // keeping one spare forecast step
+    chartLines[0].data.unshift(customChartPoint);
+    chartLines[chartLines.length - 1].data.pop(); // keeping one spare forecast step
   }
 };
 
@@ -53,7 +51,7 @@ function makeTempChartData({ list, city }: ForecastObject) {
     }
   });
 
-  // setupChartStartPoint(chartLines, { list, city });
+  setupChartStartPoint(chartLines, { list, city });
   console.log(chartLines)
 
   return chartLines;
