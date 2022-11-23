@@ -44,11 +44,12 @@ interface Props {
 const getChartColors = (forecast: TempForecastData) => forecast.map((ch) => chartColors[ch.type as ('pos' | 'neg')])
 
 const getYScale = (forecast: TempForecastData) => {
+  const allChartOrdinates = forecast.flatMap(({ data }) => data).map(({ y }) => y) || [];
   const scale = {
     type: 'linear',
     stacked: false,
-    max: Math.max(...(forecast.flatMap((item) => item.data).map(({ y }) => y) || []), 0) + 1,
-    min: Math.min(...(forecast.flatMap((item) => item.data).map(({ y }) => y) || []), 0)
+    max: Math.max(...allChartOrdinates, 0) + 1,
+    min: Math.min(...allChartOrdinates, 0)
   };
 
   return scale;
@@ -64,14 +65,6 @@ const markerNowPoint = () => {
     legend: moment.toFormat('T'),
     legendPosition: 'top-right',
     textStyle: { fontSize: '0.7em', fill: grayerText, fontWeight: 'bold' },
-  };
-};
-
-const markerZero = () => {
-  return {
-    axis: 'y',
-    value: 0,
-    lineStyle: { stroke: '#8a4f4d', strokeWidth: 2 },
   };
 };
 

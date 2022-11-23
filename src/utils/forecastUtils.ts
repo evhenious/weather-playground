@@ -6,15 +6,18 @@ import { DataType, processors } from './formatUtils';
  * Inserts custom date point as a first chart point if there is not cached data and forecast starts ahead of NOW
  */
 const setupChartStartPoint = (chartLines: TempForecastData, { list, city }: ForecastObject) => {
-  const firstForecastPoint = list[0];
+  const firstPoint = list[0]; // we care only about the very first section
 
-  if (firstForecastPoint.dt + city.timezone / 60 > Math.round(Date.now() / 1000)) {
-    const prevDatePoint = DateTime.fromSeconds(firstForecastPoint.dt, { zone: 'UTC' })
+  if (firstPoint.dt + city.timezone / 60 > Math.round(Date.now() / 1000)) {
+    const prevDatePoint = DateTime.fromSeconds(firstPoint.dt, { zone: 'UTC' })
       .minus({ hours: 3 }) //! not a timeshift, just minus 3hrs
       .toFormat('yyyy-MM-dd TT');
 
-    const customChartPoint = { x: prevDatePoint, y: processors[DataType.temp](firstForecastPoint.main.temp) };
-    chartLines[0].data.unshift(customChartPoint);
+    const customFirstPoint = {
+      x: prevDatePoint,
+      y: processors[DataType.temp](firstPoint.main.temp)
+    };
+    chartLines[0].data.unshift(customFirstPoint);
     chartLines[chartLines.length - 1].data.pop(); // keeping one spare forecast step
   }
 };
@@ -36,6 +39,7 @@ function makeTempChartData({ list, city }: ForecastObject) {
     let activeChart = chartLines[activeChartIndex];
     activeChart.data.push({ x, y });
 
+    // no need to check for an axis cross for the first point
     if (index === 0) {
       activeChart.type = y > 0 ? 'pos' : 'neg';
       return;
@@ -45,14 +49,13 @@ function makeTempChartData({ list, city }: ForecastObject) {
     const isChartSwitch = (prevY > 0 && y < 0) || (prevY < 0 && y > 0);
 
     if (isChartSwitch) {
+      // moving to the next chart section
       activeChartIndex += 1;
-      chartLines.push({ id: `temp-${activeChartIndex}`, data: [], type: y > 0 ? 'pos' : 'neg' });
-      chartLines[activeChartIndex].data.push({ x, y });
+      chartLines.push({ id: `temp-${activeChartIndex}`, data: [{ x, y }], type: y > 0 ? 'pos' : 'neg' });
     }
   });
 
   setupChartStartPoint(chartLines, { list, city });
-  console.log(chartLines)
 
   return chartLines;
 }

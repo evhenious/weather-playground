@@ -2,7 +2,7 @@ import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import TempChart from '../components/TemperatureChart';
-import { city, listPositive, listPosNeg, listPosNegPos } from './datasets';
+import { city, listPositive, listPosNeg, listPosNegPos, listNegative } from './datasets';
 import { makeTempChartData } from '../utils/forecastUtils';
 
 export default {
@@ -27,8 +27,11 @@ const Template: ComponentStory<typeof TempChart> = (args: any) => (
 export const AllPositiveTemp = Template.bind({});
 AllPositiveTemp.args = { tempData: makeTempChartData({ city, list: listPositive }) };
 
-export const PosNegTemp = Template.bind({});
-PosNegTemp.args = { tempData: makeTempChartData({ city, list: listPosNeg }) };
+export const PositiveNegativeSwitch = Template.bind({});
+PositiveNegativeSwitch.args = { tempData: makeTempChartData({ city, list: listPosNeg }) };
 
-export const PosNegPosTemp = Template.bind({});
-PosNegPosTemp.args = { tempData: makeTempChartData({ city, list: listPosNegPos }) };
+export const PositiveNegativeTwoSwitches = Template.bind({});
+PositiveNegativeTwoSwitches.args = { tempData: makeTempChartData({ city, list: listPosNegPos }) };
+
+export const AllNegativeTemp = Template.bind({});
+AllNegativeTemp.args = { tempData: makeTempChartData({ city, list: listNegative }) };
