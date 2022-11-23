@@ -53,6 +53,7 @@ export type ForecastResponse = {
 export type ForecastObject = {
   list: ForecastDataList;
   city: {
+    /** timezone shift from UTC in minutes  */
     timezone: number;
   };
 };
@@ -61,16 +62,20 @@ export type ForecastDataList = {
   main: {
     temp: number;
   };
+  /** epoch seconds UTC time  */
   dt: number;
   dt_txt: string;
 }[];
 
 type TempChartPoint = {
+  /** datetime as `yyyy-MM-dd HH:mm:ss` */
   x: string;
+  /** celsius degrees */
   y: number;
 };
 
 export type TempForecastData = {
   id: string;
+  type: 'pos' | 'neg',
   data: TempChartPoint[];
 }[];

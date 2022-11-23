@@ -5,6 +5,10 @@ import { TempForecastData } from '../types';
 
 const grayText = '#626262';
 const grayerText = '#404040';
+const chartColors = {
+  pos: 'rgb(254, 243, 199)',
+  neg: 'rgb(219, 234, 254)'
+}
 
 const nivoTheme = {
   textColor: 'white',
@@ -37,12 +41,15 @@ interface Props {
   tempData: TempForecastData;
 }
 
+const getChartColors = (forecast: TempForecastData) => forecast.map((ch) => chartColors[ch.type as ('pos' | 'neg')])
+
 const getYScale = (forecast: TempForecastData) => {
+  const allChartOrdinates = forecast.flatMap(({ data }) => data).map(({ y }) => y) || [];
   const scale = {
     type: 'linear',
     stacked: false,
-    max: Math.max(...(forecast[0].data.map(({ y }) => y) || []), 0) + 1,
-    min: Math.min(...(forecast[1].data.map(({ y }) => y) || []), 0),
+    max: Math.max(...allChartOrdinates, 0) + 1,
+    min: Math.min(...allChartOrdinates, 0)
   };
 
   return scale;
@@ -72,7 +79,7 @@ const TempChart: React.FC<Props> = ({ tempData }) => {
         margin={{ left: 20, right: 20, bottom: 40, top: 15 }}
         data={tempData}
         curve={'monotoneX'}
-        colors={['rgb(254, 243, 199)', 'rgb(219, 234, 254)']}
+        colors={getChartColors(tempData)}
         enableArea={true}
         areaOpacity={0.4}
         enablePoints={true}
