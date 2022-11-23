@@ -71,7 +71,7 @@ type TempChartPoint = {
   /** datetime as `yyyy-MM-dd HH:mm:ss` */
   x: string;
   /** celsius degrees */
-  y: number;
+  y: number | null;
 };
 
 export type TempForecastData = {

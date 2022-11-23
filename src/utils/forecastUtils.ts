@@ -28,31 +28,28 @@ const setupChartStartPoint = (chartLines: TempForecastData, { list, city }: Fore
 function makeTempChartData({ list, city }: ForecastObject) {
   const chartLines: TempForecastData = [
     { id: 'temp-0', data: [], type: 'pos' },
+    { id: 'temp-1', data: [], type: 'neg' },
   ];
 
-  let activeChartIndex = 0;
+  const tempCheckers = {
+    pos: (temp: number) => temp >= 0,
+    neg: (temp: number) => temp <= 0
+  }
+
   list.forEach(({ main, dt_txt }, index, arr) => {
-    const { temp } = main;
     const x = dt_txt;
-    const y = processors[DataType.temp](temp);
+    const { temp } = main;
+    const prevTemp = arr[index - 1]?.main.temp || temp;
 
-    let activeChart = chartLines[activeChartIndex];
-    activeChart.data.push({ x, y });
+    const isChartSwitch = (prevTemp > 0 && temp <= 0) || (prevTemp <= 0 && temp > 0);
 
-    // no need to check for an axis cross for the first point
-    if (index === 0) {
-      activeChart.type = y > 0 ? 'pos' : 'neg';
-      return;
-    }
-
-    const prevY = processors[DataType.temp](arr[index - 1].main.temp);
-    const isChartSwitch = (prevY > 0 && y < 0) || (prevY < 0 && y > 0);
-
-    if (isChartSwitch) {
-      // moving to the next chart section
-      activeChartIndex += 1;
-      chartLines.push({ id: `temp-${activeChartIndex}`, data: [{ x, y }], type: y > 0 ? 'pos' : 'neg' });
-    }
+    chartLines.forEach((chart) => {
+      const point = {
+        x,
+        y: (isChartSwitch || tempCheckers[chart.type](temp)) ? processors[DataType.temp](temp) : null
+      };
+      chart.data.push(point);
+    });
   });
 
   setupChartStartPoint(chartLines, { list, city });

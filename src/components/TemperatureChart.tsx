@@ -44,7 +44,7 @@ interface Props {
 const getChartColors = (forecast: TempForecastData) => forecast.map((ch) => chartColors[ch.type as ('pos' | 'neg')])
 
 const getYScale = (forecast: TempForecastData) => {
-  const allChartOrdinates = forecast.flatMap(({ data }) => data).map(({ y }) => y) || [];
+  const allChartOrdinates = forecast.flatMap(({ data }) => data).map(({ y }) => y ?? 0) || [];
   const scale = {
     type: 'linear',
     stacked: false,
