@@ -13,12 +13,10 @@ const setupChartStartPoint = (chartLines: TempForecastData, { list, city }: Fore
       .minus({ hours: 3 }) //! not a timeshift, just minus 3hrs
       .toFormat('yyyy-MM-dd TT');
 
-    const customFirstPoint = {
-      x: prevDatePoint,
-      y: processors[DataType.temp](firstPoint.main.temp)
-    };
-    chartLines[0].data.unshift(customFirstPoint);
-    chartLines[chartLines.length - 1].data.pop(); // keeping one spare forecast step
+    chartLines.forEach((chart) => {
+      chart.data.unshift({ x: prevDatePoint, y: chart.data[0].y });
+      chart.data.pop(); // keeping one spare forecast step
+    });
   }
 };
 
