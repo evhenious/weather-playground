@@ -38,7 +38,7 @@ export const processors = {
   [DataType.pressure]: (data: number) => data / 1000,
   [DataType.temp]: roundValue,
   /** @param data timestamp in seconds */
-  [DataType.time]: (data: number) => DateTime.fromSeconds(data).toFormat('hh:mm'),
+  [DataType.time]: (data: number) => DateTime.fromSeconds(data).toFormat('HH:mm'),
   [DataType.timespan]: (seconds: number) => (seconds / 60 / 60).toFixed(1),
   [DataType.speed]: roundValue,
 };
